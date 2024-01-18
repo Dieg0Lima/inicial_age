@@ -9,6 +9,11 @@ import voalle from "@/assets/modules/Voalle.png";
 import clicksign from "@/assets/modules/Clicksign.png";
 import glpi from "@/assets/modules/GLPI.png";
 
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
+import { AXIOS } from '@/Auth/adAuth.js';
+
 export default {
   name: "GridSystem",
   data() {
@@ -73,6 +78,66 @@ export default {
       ],
     };
   },
+  setup() {
+    const payload = ref({
+      email: '',
+      password: ''
+    });
+    const loading = ref(false);
+    const response = ref({
+      status: '',
+      message: '',
+      class: '',
+      display: false
+    });
+
+    const router = useRouter();
+    const authStore = useAuthStore();
+
+    // eslint-disable-next-line no-unused-vars
+    const login = async () => {
+      loading.value = true;
+      response.value.display = false;
+      response.value.class = '';
+
+      try {
+        const res = await AXIOS.post('auth/login_ad', payload.value, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access': 'application/json',
+          },
+        });
+        authStore.loginUser({ token: res.data.access_token });
+        router.replace('/inicio');
+      } catch (error) {
+        loading.value = false;
+        if (error.response) {
+          const errorResponse = error.response.status;
+          switch (errorResponse) {
+            case 401:
+              response.value.display = true;
+              response.value.status = "Erro:";
+              response.value.message = 'Usuário ou senha incorretos.';
+              response.value.class = 'trigger';
+              break;
+            case 500:
+              break;
+          }
+        }
+        response.value.display = true;
+        response.value.status = "Erro:";
+        response.value.message = 'Erro interno, tente novamente mais tarde.';
+        response.value.class = '';
+      }
+    };
+
+    return {
+      payload,
+      loading,
+      response,
+      login
+    };
+  }
 };
 </script>
 
@@ -109,13 +174,13 @@ export default {
         <div class="username-container">
           <span>Usuário</span>
           <div class="input-container">
-            <input type="" placeholder="Digite seu usuário" />
+            <input type="text" placeholder="Digite seu usuário" v-model="payload.email" />
           </div>
         </div>
         <div class="password-container">
           <span>Senha</span>
           <div class="input-container">
-            <input type="" placeholder="Digite sua senha" />
+            <input type="password" placeholder="Digite sua senha" v-model="payload.password" />
           </div>
         </div>
         <div class="footer-form">
@@ -126,7 +191,7 @@ export default {
           </div>
         </div>
         <div class="btn-container">
-          <div class="btn-submit">Entrar</div>
+          <div class="btn-submit" @click="login">Entrar</div>
         </div>
       </div>
     </div>

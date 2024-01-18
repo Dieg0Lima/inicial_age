@@ -9,10 +9,10 @@ import voalle from "@/assets/modules/Voalle.png";
 import clicksign from "@/assets/modules/Clicksign.png";
 import glpi from "@/assets/modules/GLPI.png";
 
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/authStore';
-import { AXIOS } from '@/Auth/adAuth.js';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { AXIOS } from "@/Auth/adAuth.js";
 
 export default {
   name: "GridSystem",
@@ -80,15 +80,15 @@ export default {
   },
   setup() {
     const payload = ref({
-      email: '',
-      password: ''
+      email: "",
+      password: "",
     });
     const loading = ref(false);
     const response = ref({
-      status: '',
-      message: '',
-      class: '',
-      display: false
+      status: "",
+      message: "",
+      class: "",
+      display: false,
     });
 
     const router = useRouter();
@@ -98,17 +98,17 @@ export default {
     const login = async () => {
       loading.value = true;
       response.value.display = false;
-      response.value.class = '';
+      response.value.class = "";
 
       try {
-        const res = await AXIOS.post('auth/login_ad', payload.value, {
+        const res = await AXIOS.post("auth/login_ad", payload.value, {
           headers: {
-            'Content-Type': 'application/json',
-            'Access': 'application/json',
+            "Content-Type": "application/json",
+            Access: "application/json",
           },
         });
         authStore.loginUser({ token: res.data.access_token });
-        router.replace('/inicio');
+        router.replace("/inicio");
       } catch (error) {
         loading.value = false;
         if (error.response) {
@@ -117,8 +117,8 @@ export default {
             case 401:
               response.value.display = true;
               response.value.status = "Erro:";
-              response.value.message = 'Usuário ou senha incorretos.';
-              response.value.class = 'trigger';
+              response.value.message = "Usuário ou senha incorretos.";
+              response.value.class = "trigger";
               break;
             case 500:
               break;
@@ -126,8 +126,8 @@ export default {
         }
         response.value.display = true;
         response.value.status = "Erro:";
-        response.value.message = 'Erro interno, tente novamente mais tarde.';
-        response.value.class = '';
+        response.value.message = "Erro interno, tente novamente mais tarde.";
+        response.value.class = "";
       }
     };
 
@@ -135,9 +135,9 @@ export default {
       payload,
       loading,
       response,
-      login
+      login,
     };
-  }
+  },
 };
 </script>
 
@@ -174,13 +174,21 @@ export default {
         <div class="username-container">
           <span>Usuário</span>
           <div class="input-container">
-            <input type="text" placeholder="Digite seu usuário" v-model="payload.email" />
+            <input
+              type="text"
+              placeholder="Digite seu usuário"
+              v-model="payload.email"
+            />
           </div>
         </div>
         <div class="password-container">
           <span>Senha</span>
           <div class="input-container">
-            <input type="password" placeholder="Digite sua senha" v-model="payload.password" />
+            <input
+              type="password"
+              placeholder="Digite sua senha"
+              v-model="payload.password"
+            />
           </div>
         </div>
         <div class="footer-form">
@@ -271,6 +279,7 @@ img {
   border-radius: 15px;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
   padding: 2rem;
+  animation: fadeIn 1.5s ease forwards;
 
   img {
     height: auto;

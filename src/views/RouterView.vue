@@ -1,7 +1,23 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
 const searchTerm = ref("");
+
+const contract = ref(null);
+const error = ref(null);
+
+const fetchContract = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/contracts/69352');
+    contract.value = response.data;
+  } catch (e) {
+    error.value = e.message;
+  }
+};
+
+onMounted(fetchContract);
+
 
 const sampleData = [
   {
@@ -310,6 +326,8 @@ const sampleData = [
           <p>{{ item.IdONU }}</p>
           <p>{{ item.CPF }}</p>
           <p>{{ item.Cliente }}</p>
+          <p v-if="contract">ID do Contrato: {{ contract.id }}</p>
+          <p v-if="error">{{ error }}</p>
         </div>
       </div>
     </div>

@@ -69,7 +69,7 @@ function togglePasswordVisibility() {
 <template>
   <div class="flex justify-center items-center ">
     <div class="bg-white shadow-md rounded px-12 pt-8 pb-8">
-      <img src="@/assets/AgeLogo.svg" alt="AGE Telecom" class="mx-auto mb-6" />
+      <img src="@/assets/AgeLogo.svg" alt="AGE Telecom" class="mx-auto mb-6 w-1/3" />
 
       <div class="mb-4">
         <span class="block text-blue-900 text-2xl text-center font-bold mb-2">Bem-vindo à <b>AGE</b> Telecom</span>
@@ -80,7 +80,6 @@ function togglePasswordVisibility() {
         <label class="block text-blue-900 text-sm font-bold mb-2 flex items-center" for="username">
           Usuário
           <div class="relative ml-2 flex items-center">
-            <font-awesome-icon icon="circle-info" @mouseenter="showTooltip = true" @mouseleave="showTooltip = false" />
             <div :class="['absolute', 'z-10', 'bg-black', 'text-white', 'text-xs', 'py-1', 'px-2', { 'hidden': !showTooltip }, 'left-full', 'ml-2', 'whitespace-no-wrap']">
               O Usuário é o mesmo que você utiliza para acessar seu computador
             </div>

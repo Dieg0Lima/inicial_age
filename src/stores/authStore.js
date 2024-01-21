@@ -1,22 +1,27 @@
-// @/stores/authStore.js
 import { defineStore } from 'pinia';
-import { useStorage } from '@vueuse/core';
+import axios from 'axios';
+import router from '../router';
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    user: useStorage('user', {
-      token: ''
-    }),
+    token: null,
+    loading: false,
+    responseMessage: '',
   }),
-  getters: {
-    isAuthenticated: (state) => !!state.user.token
-  },
   actions: {
-    loginUser({ token }) {
-      this.user.token = token;
+    async login(payload) {
+      this.loading = true;
+      this.responseMessage = '';
+
+      try {
+        const response = await axios.post('https://v1.ageportal.agetelecom.com.br/api/auth/login_ad', payload);
+        this.token = response.data.access_token;
+        this.loading = false;
+        router.push('/inicio');
+      } catch (error) {
+        this.responseMessage = 'Falha ao fazer login. Tente novamente mais tarde.';
+        this.loading = false;
+      }
     },
-    logoutUser() {
-      this.user.token = '';
-    }
-  }
+  },
 });

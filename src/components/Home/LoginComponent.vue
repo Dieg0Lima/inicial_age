@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/authStore";
 // import {storeToRefs} from "pinia";
 
 const payload = ref({
-  email: "",
+  username: "",
   password: "",
 });
 
@@ -45,7 +45,7 @@ function togglePasswordVisibility() {
             </div>
           </div>
         </label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Digite seu usuário" v-model="payload.email" required>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Digite seu usuário" v-model="payload.username" required>
       </div>
 
       <div class="mb-6 relative">

@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('authStore', {
       this.responseMessage = '';
 
       try {
-        const response = await axios.post('https://v1.ageportal.agetelecom.com.br/api/auth/login_ad', payload);
+        const response = await axios.post('http://localhost:3000/auth/login', payload);
         this.token = response.data.access_token;
         this.loading = false;
         router.push('/inicio');

@@ -14,7 +14,7 @@ const fetchContract = async () => {
   }
 
   try {
-    const response = await axios.get(`http://localhost:3000/api/contracts/${searchTerm.value}`);
+    const response = await axios.get(`http://192.168.1.33:3000/api/contracts/${searchTerm.value}`);
     contract.value = response.data;
     error.value = null;
   } catch (e) {

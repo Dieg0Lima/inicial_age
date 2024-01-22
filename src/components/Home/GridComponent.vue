@@ -11,6 +11,9 @@
   import guacamole from "@/assets/modules/Guacamole.png";
   import onvio from "@/assets/modules/ONVIO.png";
   import microsoft365 from "@/assets/modules/Microsoft365.png"
+  import wiki from "@/assets/modules/AtendimentoWiki.png"
+  import assinante from "@/assets/modules/AssinantePortal.png"
+  import deezer from "@/assets/modules/Deezer.png"
 
   import { ref, onMounted, watch, computed } from "vue";
 
@@ -112,6 +115,30 @@
       externalUrl: "https://login.microsoftonline.com/",
       favorited: false,
       originalIndex: 11,
+    },
+    {
+      id: 13,
+      bgColor: "linear-gradient(to right, #FFB600, #F93822)",
+      imageUrl: wiki,
+      externalUrl: "https://agetelecomltda.sharepoint.com/sites/atendimento/SitePages/Home.aspx?ga=1",
+      favorited: false,
+      originalIndex: 12,
+    },
+    {
+      id: 14,
+      bgColor: "linear-gradient(to right, #FFB600, #F93822)",
+      imageUrl: assinante,
+      externalUrl: "https://www.portaldoassinante.com/agetelecom",
+      favorited: false,
+      originalIndex: 13,
+    },
+    {
+      id: 15,
+      bgColor: "#FFFFFF",
+      imageUrl: deezer,
+      externalUrl: "https://www.deezer.com/br/activate/playhubbr",
+      favorited: false,
+      originalIndex: 14,
     },
   ]);
   const hoveredItem = ref(null);

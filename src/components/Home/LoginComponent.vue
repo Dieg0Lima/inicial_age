@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/authStore";
 // import {storeToRefs} from "pinia";
 
 const payload = ref({
-  username: "",
+  email: "",
   password: "",
 });
 
@@ -28,7 +28,7 @@ function togglePasswordVisibility() {
 
 <template>
   <div class="flex justify-center items-center ">
-    <div class="bg-white shadow-md rounded px-12 pt-8 pb-8">
+    <form @submit.prevent="login" class="bg-white shadow-md rounded px-12 pt-8 pb-8">
       <img src="@/assets/AgeLogo.svg" alt="AGE Telecom" class="mx-auto mb-6 w-1/3" />
 
       <div class="mb-4">
@@ -45,7 +45,7 @@ function togglePasswordVisibility() {
             </div>
           </div>
         </label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Digite seu usuário" v-model="payload.username" required>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Digite seu usuário" v-model="payload.email" required>
       </div>
 
       <div class="mb-6 relative">
@@ -62,11 +62,11 @@ function togglePasswordVisibility() {
       </div>
 
       <div class="flex items-center justify-between">
-        <button class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" style="background-image: linear-gradient(to right, #FFB600, #F93822);" type="button" @click="login">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" style="background-image: linear-gradient(to right, #FFB600, #F93822);">
           Entrar
         </button>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 

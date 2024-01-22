@@ -12,9 +12,10 @@ import { faCircleInfo} from '@fortawesome/free-solid-svg-icons';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
+import { faUser as fasUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-library.add(faUserSecret, faCircleInfo, faEye, faEyeSlash, fasStar, farStar);
+library.add(faUserSecret, faCircleInfo, faEye, faEyeSlash, fasStar, farStar, fasUser);
 
 createApp(App)
     .component('font-awesome-icon', FontAwesomeIcon)

@@ -1,18 +1,45 @@
+import LoginPage from "@/views/LoginPage.vue";
+import DefaultLayout from "@/layout/DefaultLayout.vue";
+import AttendantRouter from "@/components/Attendant/AttendantRouter.vue";
+import HomeComponent from "@/components/Home/HomeComponent.vue";
+import DetailComponent from "@/components/Attendant/DetailComponent.vue";
+import ReportRouter from "@/components/Report/ReportRouter.vue";
+import OltListComponent from "@/components/OLTs/OltListComponent.vue";
 
-export const routes = [
+const routes = [
+  {
+    path: '/login',
+    component: LoginPage,
+  },
   {
     path: '/',
+    component: DefaultLayout,
     children: [
       {
-        path: '',
-        name: 'login',
-        component: () => import("@/views/HomeView.vue"),
+        path: '/inicio',
+        component: HomeComponent,
       },
       {
-        path: '/inicio',
-        name: 'route',
-        component: () => import("@/views/RouterView.vue")
-      }
+        path: '/atendimento/inicio',
+        component: AttendantRouter,
+      },
+      {
+        path: '/atendimento/:id2/:id1/:id',
+        name: 'detalhes-contrato',
+        component: DetailComponent,
+        props: true,
+      },
+      {
+        path: '/atendimento/olt/:contractId',
+        component: OltListComponent,
+        name: 'olt-list',
+        props: true,
+      },
+      {
+        path: 'relatorio/inicio',
+        component: ReportRouter,
+      },
     ]
   },
 ];
+export default routes;

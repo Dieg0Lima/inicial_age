@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from "vue";
 import { useAuthStore } from "@/stores/authStore";
-// import {storeToRefs} from "pinia";
 
 const payload = ref({
   email: "",
@@ -13,8 +12,6 @@ const authStore = useAuthStore();
 const login = () => {
   authStore.login(payload.value);
 };
-
-// const { loading, responseMessage } = storeToRefs(authStore);
 
 const showTooltip = ref(false);
 

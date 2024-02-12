@@ -10,10 +10,7 @@ export default {
 
 <template>
   <div class="container-page p-8 relative flex items-center justify-center">
-    <!-- Background com Efeito Blur -->
     <div class="absolute inset-0 bg-background-img bg-cover bg-center blur-2xl"></div>
-
-    <!-- Seus componentes principais -->
     <div style="z-index: 1; display: flex; justify-content: center; align-content: center; flex-direction: row; height: 60vh; gap: 4rem">
       <grid-component></grid-component>
       <login-component></login-component>

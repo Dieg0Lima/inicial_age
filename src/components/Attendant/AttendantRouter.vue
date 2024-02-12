@@ -3,44 +3,87 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const searchTerm = ref("");
-const searchType = ref("contract_number");
 
 const contracts = ref(null);
 const error = ref(null);
 
+const isLoading = ref(false);
+
 const fetchContract = async () => {
   error.value = null;
+  isLoading.value = true;
 
   if (!searchTerm.value) {
     error.value = "Por favor, insira um termo de pesquisa.";
     return;
   }
 
+  let searchType;
+
+  if (isName(searchTerm.value)) {
+    searchType = 'client_name';
+  } else if (isContractNumber(searchTerm.value)) {
+    searchType = 'id';
+  } else if (isCPF(searchTerm.value)) {
+    searchType = 'tx_id';
+  } else if (isCNPJ(searchTerm.value)) {
+    searchType = 'tx_id'
+  } else if (isEquipmentSerial(searchTerm.value)) {
+    searchType = 'equipment_serial_number'
+  }
+
   try {
     const params = {
-      [searchType.value]: searchTerm.value
+      [searchType]: searchTerm.value
     };
     const response = await axios.get(`http://192.168.69.80:3000/api/contracts`, { params });
     contracts.value = response.data.contracts;
   } catch (e) {
     error.value = e.response?.data?.error || e.message;
+  } finally {
+    isLoading.value = false;
   }
 };
 
-onMounted(fetchContract);
+const statusClass = (contract) => {
+  if (contract.v_status === 'Normal') {
+    return 'text-green';
+  } else if (contract.v_status === 'Cancelado') {
+    return 'text-red';
+  } else {
+    return '';
+  }
+};
 
+const isName = (term) => {
+  const nameRegex = /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ' -]+$/;
+  return nameRegex.test(term);
+};
+
+const isContractNumber = (term) => {
+  const numberRegex = /^\d+$/;
+  return numberRegex.test(term);
+};
+
+const isCPF = (term) => {
+  const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+  return cpfRegex.test(term);
+};
+
+const isCNPJ = (term) => {
+  const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
+  return cnpjRegex.test(term);
+};
+
+const isEquipmentSerial = (term) => {
+  return term.startsWith("ALCL");
+};
+
+onMounted(fetchContract);
 </script>
 
 <template>
   <div class="page-container">
-    <div class="btn-back">
-      <router-link to="/">
-        <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
-          <path fill="#ffffff"
-            d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288 480 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-370.7 0 73.4-73.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-128 128z" />
-        </svg>
-      </router-link>
-    </div>
     <div class="title-page">
       <label>Pesquisar</label>
     </div>
@@ -49,18 +92,6 @@ onMounted(fetchContract);
     </div>
     <form @submit.prevent="fetchContract" class="search-container">
       <input type="text" placeholder="Digite aqui..." v-model="searchTerm" />
-      <div class="search-type-selector mr-2">
-        <select v-model="searchType" class="bg-white border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-700 p-2">
-          <option value="contract_number">Número do Contrato</option>
-          <option value="client_name">Nome do Cliente</option>
-          <option value="tx_id">CPF/CNPJ</option>
-          <option value="email">Email</option>
-          <option value="cell_phone_1">Telefone 1</option>
-          <option value="cell_phone_2">Telefone 2</option>
-          <option value="postal_code">CEP</option>
-          <option value="v_status">STATUS</option>
-        </select>
-      </div>
       <div class="options-container">
         <button type="submit" class="btn-search">
           <label>Pesquisar</label>
@@ -74,76 +105,86 @@ onMounted(fetchContract);
       </div>
     </form>
 
-    <div class="grid-container">
-      <div class="contract-card" v-for="contract in contracts" :key="contract.contract_number">
+    <div class="loading" v-if="isLoading">
+      <div class="loadingio-spinner-dual-ring-pelu7rtlzto"><div class="ldio-kh5o7t8djcs">
+        <div></div><div><div></div></div>
+      </div></div>
+    </div>
+
+    <div class="grid-container" v-else>
+      <div class="contract-card" v-for="contract in contracts" :key="contract.equipment_serial_number">
+        <router-link :to="{ name: 'detalhes-contrato', params: { id: contract.equipment_serial_number || '-', id1: contract.id, id2: contract.connection_id || '-' } }">
           <div class="flex space-x-2 items-center">
-            <font-awesome-icon :icon="['fas', 'user']" />
+            <font-awesome-icon :icon="['fas', 'user']"/>
             <h1 class="font-extrabold">Dados do Contrato</h1>
           </div>
-        <div class="mt-4 flex justify-between">
-          <div>
-            <p class="font-bold">Nome</p>
-            <p>{{ contract.client_name}}</p>
+          <div class="mt-4 flex justify-between">
+            <div v-if="contract.client_name">
+              <p class="font-bold">Nome</p>
+              <p>{{ contract.client_name }}</p>
+            </div>
+            <div v-if="contract.tx_id">
+              <p class="font-bold">CPF/CNPJ</p>
+              <p>{{ contract.tx_id }}</p>
+            </div>
           </div>
-          <div>
-            <p class="font-bold">CPF/CNPJ</p>
-            <p>{{ contract.tx_id}}</p>
-          </div>
-        </div>
           <div class="mt-2 flex justify-between">
-            <div>
+            <div v-if="contract.id">
               <p class="font-bold">Contrato</p>
-              <p>{{ contract.contract_number }}</p>
+              <p>{{ contract.id }}</p>
             </div>
-            <div>
+            <div v-if="contract.v_status">
               <p class="font-bold flex">Status</p>
-              <p>{{ contract.v_status }}</p>
+              <p class="font-bold" :class="statusClass(contract)">{{ contract.v_status }}</p>
             </div>
-            <div>
+            <div v-if="contract.v_stage">
               <p class="font-bold">Estágio</p>
               <p>{{ contract.v_stage }}</p>
             </div>
-            <div>
+            <div v-if="contract.equipment_serial_number || 'sem serial'">
               <p class="font-bold">Equipamento</p>
-              <p>{{ contract.equipment_serial_number }}</p>
+              <p>{{ contract.equipment_serial_number || 'Não possui equipamento' }}</p>
             </div>
           </div>
-        <div class="mt-2 flex justify-between">
-            <div>
+          <div class="mt-2 flex justify-between">
+            <div v-if="contract.email">
               <p class="font-bold">E-mail</p>
               <p>{{ contract.email }}</p>
             </div>
-          <div>
-            <p class="font-bold">Contato 1</p>
-            <p>{{ contract.cell_phone_1 }}</p>
+            <div v-if="contract.cell_phone_1">
+              <p class="font-bold">Contato 1</p>
+              <p>{{ contract.cell_phone_1 }}</p>
+            </div>
+            <div v-if="contract.cell_phone_2">
+              <p class="font-bold">Contato 2</p>
+              <p>{{ contract.cell_phone_2 }}</p>
+            </div>
           </div>
-          <div>
-            <p class="font-bold">Contato 2</p>
-            <p>{{ contract.cell_phone_2 }}</p>
+          <div class="mt-2 flex justify-between">
+            <div v-if="contract.street">
+              <p class="font-bold">Endereço</p>
+              <p>{{ contract.street }} {{ contract.number }}</p>
+            </div>
+            <div v-if="contract.neighborhood">
+              <p class="font-bold">Bairro</p>
+              <p>{{ contract.neighborhood }}</p>
+            </div>
+            <div v-if="contract.postal_code">
+              <p class="font-bold">CEP</p>
+              <p>{{ contract.postal_code }}</p>
+            </div>
           </div>
+          <div class="mt-2 flex justify-between">
+            <div v-if="contract.complement">
+              <p class="font-bold">Descrição</p>
+              <p>{{ contract.complement }}</p>
+            </div>
           </div>
-        <div class="mt-2 flex justify-between">
-          <div>
-            <p class="font-bold">Logradouro</p>
-            <p>{{ contract.neighborhood }}</p>
-          </div>
-          <div>
-            <p class="font-bold">Rua</p>
-            <p>{{ contract.street }}</p>
-          </div>
-          <div>
-            <p class="font-bold">CEP</p>
-            <p>{{ contract.postal_code }}</p>
-          </div>
-        </div>
-        <div class="mt-2 flex justify-between">
-          <div>
-            <p class="font-bold">Descrição</p>
-            <p>{{ contract.complement }}</p>
-          </div>
-        </div>
-        </div>
+        </router-link>
+
+      </div>
     </div>
+
 
   </div>
 </template>
@@ -157,6 +198,7 @@ onMounted(fetchContract);
   align-items: center;
   flex-direction: column;
   overflow-y: scroll;
+  background-color: whitesmoke;
 }
 
 .title-page {
@@ -256,6 +298,7 @@ input {
   height: 5vh;
   border: none;
   font-size: 1.2rem;
+  background-color: whitesmoke;
 }
 
 input::placeholder {
@@ -293,5 +336,13 @@ input:focus {
 
 .contract-details {
   margin-top: 10px;
+}
+
+.text-green {
+  color: green;
+}
+
+.text-red {
+  color: red;
 }
 </style>

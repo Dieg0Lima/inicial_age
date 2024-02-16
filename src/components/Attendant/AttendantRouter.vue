@@ -1,22 +1,27 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
+import { nextTick } from 'vue';
 import axios from 'axios';
 
 const searchTerm = ref("");
 
 const contracts = ref(null);
 const error = ref(null);
+const currentPage = ref(1);
+const totalPages = ref(0);
+const totalContracts = ref(0);
 
 const isLoading = ref(false);
 
-const fetchContract = async () => {
+const fetchContract = async (page = 1) => {
   error.value = null;
-  isLoading.value = true;
 
   if (!searchTerm.value) {
     error.value = "Por favor, insira um termo de pesquisa.";
     return;
   }
+
+  isLoading.value = true;
 
   let searchType;
 
@@ -34,14 +39,29 @@ const fetchContract = async () => {
 
   try {
     const params = {
-      [searchType]: searchTerm.value
+      [searchType]: searchTerm.value,
+      page: page
     };
     const response = await axios.get(`http://192.168.69.80:3000/api/contracts`, { params });
     contracts.value = response.data.contracts;
+    currentPage.value = response.data.meta.current_page;
+    totalPages.value = response.data.meta.total_pages;
+    totalContracts.value = response.data.meta.total_count;
   } catch (e) {
     error.value = e.response?.data?.error || e.message;
   } finally {
     isLoading.value = false;
+  }
+};
+
+const changePage = async (newPage) => {
+  if (newPage >= 1 && newPage <= totalPages.value) {
+    currentPage.value = newPage;
+    await fetchContract(newPage);
+
+    await nextTick(() => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
   }
 };
 
@@ -79,7 +99,6 @@ const isEquipmentSerial = (term) => {
   return term.startsWith("ALCL");
 };
 
-onMounted(fetchContract);
 </script>
 
 <template>
@@ -93,25 +112,16 @@ onMounted(fetchContract);
     <form @submit.prevent="fetchContract" class="search-container">
       <input type="text" placeholder="Digite aqui..." v-model="searchTerm" />
       <div class="options-container">
-        <button type="submit" class="btn-search">
-          <label>Pesquisar</label>
-          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
-            <path fill="#ffffff" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6
-          457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4
-          25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416
-          208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-          </svg>
+        <button class="button-with-spinner px-4 py-2 text-sm font-medium rounded text-white bg-orange-500 hover:bg-orange-600 transition">
+          <font-awesome-icon v-show="isLoading" class="spinner animate-spin h-5 w-5" :icon="['fas', 'spinner']" />
+          <font-awesome-icon :class="{'invisible': isLoading}" class="mr-4" :icon="['fas', 'magnifying-glass']" />
+          <span :class="{'invisible': isLoading}">Pesquisar</span>
         </button>
       </div>
+
     </form>
 
-    <div class="loading" v-if="isLoading">
-      <div class="loadingio-spinner-dual-ring-pelu7rtlzto"><div class="ldio-kh5o7t8djcs">
-        <div></div><div><div></div></div>
-      </div></div>
-    </div>
-
-    <div class="grid-container" v-else>
+    <div class="grid-container">
       <div class="contract-card" v-for="contract in contracts" :key="contract.equipment_serial_number">
         <router-link :to="{ name: 'detalhes-contrato', params: { id: contract.equipment_serial_number || '-', id1: contract.id, id2: contract.connection_id || '-' } }">
           <div class="flex space-x-2 items-center">
@@ -185,6 +195,15 @@ onMounted(fetchContract);
       </div>
     </div>
 
+    <div class="mb-6" v-if="totalPages > 1">
+      <button class="mr-4" @click="changePage(currentPage - 1)" :class="{ 'disabled-class': currentPage <= 1 }" :disabled="currentPage <= 1">
+        <font-awesome-icon :icon="['fas', 'chevron-left']" />
+      </button>
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <button class="ml-4" @click="changePage(currentPage + 1)" :disabled="currentPage >= totalPages">
+        <font-awesome-icon :icon="['fas', 'chevron-right']" />
+      </button>
+    </div>
 
   </div>
 </template>
@@ -216,6 +235,17 @@ onMounted(fetchContract);
   font-size: 1rem;
   font-weight: 600;
   color: #444444;
+}
+
+.button-with-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.button-with-spinner .spinner {
+  position: absolute;
 }
 
 .btn-back {
@@ -289,6 +319,7 @@ onMounted(fetchContract);
   flex-direction: row;
   border: 2px solid #e3e3e3;
   border-radius: .5rem;
+  background-color: #ffffff;
 }
 
 input {
@@ -298,7 +329,7 @@ input {
   height: 5vh;
   border: none;
   font-size: 1.2rem;
-  background-color: whitesmoke;
+  background-color: #ffffff;
 }
 
 input::placeholder {
@@ -311,10 +342,15 @@ input:focus {
   border: none;
 }
 
+.disabled-class {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .grid-container {
   width: 90%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
   gap: 20px;
   padding: 20px;
 }

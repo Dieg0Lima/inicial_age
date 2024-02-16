@@ -13,6 +13,7 @@ const activeOnuId = ref(null);
 const selectedItemIndex = ref(null);
 const availabilityResponses = ref([]);
 
+const connectionId = route.params.connectionId;
 
 onMounted(async () => {
   try {
@@ -76,7 +77,8 @@ async function provision_onu(index, port, slot, pon, serial) {
       pon: pon,
       id: lastClickedOltId.value,
       contract: contractId,
-      sernum: serial
+      sernum: serial,
+      connection_id: connectionId
     });
     availability.value = response.data.response;
   } catch (error) {

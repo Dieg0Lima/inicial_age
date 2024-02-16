@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('authStore', {
         const response = await axios.post('https://v1.ageportal.agetelecom.com.br/api/auth/login_ad', payload);
         this.token = response.data.access_token;
         this.loading = false;
-        router.push('/inicio');
+        router.push('/atendimento/inicio');
       } catch (error) {
         this.responseMessage = 'Falha ao fazer login. Tente novamente mais tarde.';
         this.loading = false;

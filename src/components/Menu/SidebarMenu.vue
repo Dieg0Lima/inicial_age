@@ -15,11 +15,11 @@
             <font-awesome-icon :icon="['fas', 'headset']" />
           </router-link>
         </li>
-        <li class="mb-4">
-          <router-link to="/relatorio/inicio" class="text-gray-900 hover:bg-gray-200 p-4 block">
-            <font-awesome-icon :icon="['fas', 'paste']" />
-          </router-link>
-        </li>
+<!--        <li class="mb-4">-->
+<!--          <router-link to="/relatorio/inicio" class="text-gray-900 hover:bg-gray-200 p-4 block">-->
+<!--            <font-awesome-icon :icon="['fas', 'paste']" />-->
+<!--          </router-link>-->
+<!--        </li>-->
       </ul>
     </nav>
     <nav>

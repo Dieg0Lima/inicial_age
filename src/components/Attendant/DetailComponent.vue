@@ -3,6 +3,7 @@ import {onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import axios from 'axios';
 import { format } from 'date-fns';
+// import ConfirmModal from "@/components/_fragments/modal/ConfirmModal.vue";
 
 const route = useRoute();
 const contractNumber = ref('');
@@ -12,7 +13,11 @@ const contracts = ref({});
 const FAT = ref({});
 const assignments = ref({});
 const authentications = ref({});
+const rxSignalLevel = ref('');
 const contractStatus = ref('');
+const unprovision = ref();
+
+// const isModalOpen = ref(false);
 
 
 onMounted(async () => {
@@ -51,14 +56,42 @@ onMounted(async () => {
   }
 
   try {
-    const responseAuthentication = await axios.get(`http://192.168.69.80:3000/equipment/${equipmentSerial.value}`);
+    const responseAuthentication = await axios.get(`http://192.168.69.80:3000/equipment/${connection.value}`);
     authentications.value = responseAuthentication.data || {};
+
+    const response  = await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
+      command: "potency_onu",
+      slot: authentications.value[0].slot,
+      pon: authentications.value[0].pon,
+      olt_id: authentications.value[0].olt_id,
+      equipment_id: authentications.value[0].equipment_id
+    });
+
+    rxSignalLevel.value = response.data.rx_signal_level;
+
   } catch (error) {
-    console.error("Erro ao buscar autenticações:", error);
+    console.error("Erro ao buscar autenticações ou potência:", error);
     authentications.value = {};
   }
-
 });
+
+
+async function unprovision_onu(slot, pon, olt_id, equipment_id) {
+  try {
+    const response = await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
+      command: "unprovision_onu",
+      slot: slot,
+      pon: pon,
+      port: olt_id,
+      id: equipment_id
+    });
+
+    unprovision.value = response.data.response;
+
+  } catch (error) {
+    console.error("Erro ao executar o comando de desprovisionamento:", error);
+  }
+}
 
 function formatDate(dateString) {
   const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -217,7 +250,7 @@ const statusFATClass = (fat) => {
           </div>
         </div>
         <div class="contract-card mt-2 mb-2">
-          <div class="flex mb-4 space-x-2 items-center justify-between">
+          <div class="flex space-x-2 items-center justify-between">
             <div class="flex space-x-2 items-center">
               <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" />
               <h1 class="font-extrabold">Dados de Fatura</h1>
@@ -227,7 +260,7 @@ const statusFATClass = (fat) => {
             </div>
           </div>
           <div v-if="isExpanded">
-            <div class="contract-card" v-for="fat in FAT" :key="fat.contract_number">
+            <div class="contract-card mt-4" v-for="fat in FAT" :key="fat.contract_number">
               <div class="flex justify-between">
                 <div>
                   <div v-if="fat.fat_number">
@@ -255,7 +288,7 @@ const statusFATClass = (fat) => {
         </div>
         <div class="col-span-1">
           <div  class="contract-card mt-2 mb-2">
-            <div class="flex mb-4 space-x-2 items-center justify-between">
+            <div class="flex space-x-2 items-center justify-between">
               <div class="flex space-x-2 items-center">
                 <font-awesome-icon :icon="['fas', 'ticket']" />
                 <h1 class="font-extrabold">Aberturas de Atendimento</h1>
@@ -265,7 +298,7 @@ const statusFATClass = (fat) => {
               </div>
             </div>
             <div v-if="isExpandedAtt">
-              <div v-for="assignments in assignments" :key="assignments.tag_id" class="contract-card">
+              <div v-for="assignments in assignments" :key="assignments.tag_id" class="contract-card mt-4">
                 <div class="flex justify-between">
                   <div class="mr-4">
                     <div v-if="assignments.assignment_title">
@@ -292,7 +325,7 @@ const statusFATClass = (fat) => {
       <div class="col-span-1" v-for="authentication in authentications" :key="authentication.equipment">
         <div class="contract-card mt-2 mb-2">
           <div class="flex space-x-2 items-center">
-            <font-awesome-icon :icon="['fas', 'user']" />
+            <font-awesome-icon :icon="['fas', 'wifi']" />
             <h1 class="font-extrabold">Dados de Conexão</h1>
           </div>
           <div class="mt-4 flex justify-between">
@@ -334,14 +367,14 @@ const statusFATClass = (fat) => {
               <p class="font-bold">SSID do Wi-Fi</p>
               <p>{{ authentication.ssid }}</p>
             </div>
-            <div v-if="authentication.password">
+            <div class="mr-8" v-if="authentication.password">
               <p class="font-bold">Senha do Wi-Fi</p>
               <p>{{ authentication.password }}</p>
             </div>
-            <div v-if="authentication.postal_code">
-              <p class="font-bold">CEP</p>
-              <p>{{ authentication.postal_code }}</p>
-            </div>
+                <div class="mr-8">
+                  <p class="font-bold">Potência da ONU</p>
+                  <p>{{ rxSignalLevel  }}</p>
+                </div>
           </div>
           <div class="mt-2 flex justify-between">
             <div v-if="authentication.complement">
@@ -352,13 +385,22 @@ const statusFATClass = (fat) => {
         </div>
       </div>
       <div class="col-span-1">
-        <div v-if="contracts.length > 0">
-          <router-link :to="{ name: 'olt-list', params: { contractId: contracts[0].id } }">
-            <div class="function-btn p-4 mt-4 rounded text-white font-medium text-center bg-amber-500">
-              <span>Provisionamento</span>
+        <div v-if="contracts.length > 0 && authentications.length > 0">
+          <router-link :to="{ name: 'olt-list', params: { contractId: contracts[0].id, connectionId: authentications[0].id } }">
+            <div class="function-btn p-4 mt-4 rounded text-white font-medium text-center bg-orange-500 hover:bg-orange-600 transition">
+              <span>Provisionar</span>
             </div>
           </router-link>
         </div>
+        <div @click="unprovision_onu(authentications[0].slot, authentications[0].pon, authentications[0].olt_id, authentications[0].equipment_id)">
+          <div class="cursor-pointer function-btn p-4 mt-4 rounded text-white font-medium text-center bg-orange-500 hover:bg-orange-600 transition">
+            <span>Desprovisionar</span>
+          </div>
+        </div>
+<!--        <div>-->
+<!--          <button @click="isModalOpen = true">Abrir Modal</button>-->
+<!--          <ConfirmModal :isModalOpen="isModalOpen" @close="isModalOpen = false" />-->
+<!--        </div>-->
       </div>
     </div>
   </div>

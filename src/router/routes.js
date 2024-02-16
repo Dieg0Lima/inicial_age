@@ -24,13 +24,13 @@ const routes = [
         component: AttendantRouter,
       },
       {
-        path: '/atendimento/:id2/:id1/:id',
+        path: '/atendimento/:id2/:id1/',
         name: 'detalhes-contrato',
         component: DetailComponent,
         props: true,
       },
       {
-        path: '/atendimento/olt/:contractId',
+        path: '/atendimento/olt/:contractId/:connectionId',
         component: OltListComponent,
         name: 'olt-list',
         props: true,

@@ -44,6 +44,8 @@ async function unprovision_list(id) {
 }
 
 async function availability_pon(slot, pon, index) {
+  isLoading.value = true;
+
   try {
     const response = await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
       command: "availability_pon",
@@ -57,6 +59,8 @@ async function availability_pon(slot, pon, index) {
 
   } catch (error) {
     console.error("Erro ao executar o comando de disponibilidade PON:", error);
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -121,6 +125,11 @@ async function provision_onu(index, port, slot, pon, serial) {
                 <p class="font-medium text-red-600">ONU Desprovisionada</p>
               </div>
             </div>
+          </div>
+          <div class="loading" v-if="isLoading">
+            <div class="loadingio-spinner-dual-ring-pelu7rtlzto"><div class="ldio-kh5o7t8djcs">
+              <div></div><div><div></div></div>
+            </div></div>
           </div>
         </div>
         <div v-for="(responseItem, responseIndex) in availabilityResponses[index]" :key="`response-${responseIndex}`">

@@ -13,6 +13,21 @@ const totalContracts = ref(0);
 
 const isLoading = ref(false);
 
+const determineSearchType = (term) => {
+  if (isCPF(term)) {
+    return 'tx_id';
+  } else if (isCNPJ(term)) {
+    return 'tx_id';
+  } else if (isContractNumber(term)) {
+    return 'id';
+  } else if (isName(term)) {
+    return 'client_name';
+  } else if (isEquipmentSerial(term)) {
+    return 'equipment_serial_number';
+  }
+  return null;
+};
+
 const fetchContract = async (page = 1) => {
   error.value = null;
 
@@ -22,19 +37,12 @@ const fetchContract = async (page = 1) => {
   }
 
   isLoading.value = true;
+  const searchType = determineSearchType(searchTerm.value);
 
-  let searchType;
-
-  if (isName(searchTerm.value)) {
-    searchType = 'client_name';
-  } else if (isContractNumber(searchTerm.value)) {
-    searchType = 'id';
-  } else if (isCPF(searchTerm.value)) {
-    searchType = 'tx_id';
-  } else if (isCNPJ(searchTerm.value)) {
-    searchType = 'tx_id'
-  } else if (isEquipmentSerial(searchTerm.value)) {
-    searchType = 'equipment_serial_number'
+  if (!searchType) {
+    error.value = "Termo de pesquisa inválido.";
+    isLoading.value = false;
+    return;
   }
 
   try {
@@ -82,16 +90,16 @@ const isName = (term) => {
 
 const isContractNumber = (term) => {
   const numberRegex = /^\d+$/;
-  return numberRegex.test(term);
+  return numberRegex.test(term) && !isCPF(term) && !isCNPJ(term);
 };
 
 const isCPF = (term) => {
-  const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+  const cpfRegex = /^\d{11}$/;
   return cpfRegex.test(term);
 };
 
 const isCNPJ = (term) => {
-  const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
+  const cnpjRegex = /^\d{14}$/;
   return cnpjRegex.test(term);
 };
 

@@ -9,9 +9,9 @@ export default {
 </script>
 
 <template>
-  <div class="container-page p-8 relative flex items-center justify-center">
+  <div class="container-page relative flex items-center justify-center">
     <div class="absolute inset-0 bg-background-img bg-cover bg-center blur-2xl"></div>
-    <div style="z-index: 1; display: flex; justify-content: center; align-content: center; flex-direction: row; height: 60vh; gap: 4rem">
+    <div style="z-index: 1; display: flex; flex-direction: row; height: 80vh; gap: 4rem">
       <grid-component></grid-component>
       <login-component></login-component>
     </div>

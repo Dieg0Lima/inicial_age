@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { nextTick } from 'vue';
-import axios from 'axios';
+import axios from '@/api/axios';
 
 const searchTerm = ref("");
 
@@ -50,7 +50,7 @@ const fetchContract = async (page = 1) => {
       [searchType]: searchTerm.value,
       page: page
     };
-    const response = await axios.get(`http://192.168.69.80:3000/api/contracts`, { params });
+    const response = await axios.get(`/contracts`, { params });
     contracts.value = response.data.contracts;
     currentPage.value = response.data.meta.current_page;
     totalPages.value = response.data.meta.total_pages;

@@ -42,7 +42,7 @@ onMounted(async () => {
   }
 
   try {
-    const responseFAT = await axios.get(`http://192.168.69.80:3000/financial_info/${contractNumber.value}`);
+    const responseFAT = await axios.get(`http://192.168.69.80:3000/api/financial_info/${contractNumber.value}`);
     FAT.value = responseFAT.data || {};
   } catch (error) {
     console.error("Erro ao buscar informações financeiras:", error);
@@ -50,7 +50,7 @@ onMounted(async () => {
   }
 
   try {
-    const responseAssignments = await axios.get(`http://192.168.69.80:3000/assignments/${contractNumber.value}`);
+    const responseAssignments = await axios.get(`http://192.168.69.80:3000/api/assignments/${contractNumber.value}`);
     assignments.value = responseAssignments.data || [];
   } catch (error) {
     console.error("Erro ao buscar as atribuições:", error);
@@ -58,11 +58,11 @@ onMounted(async () => {
   }
 
   try {
-    const responseAuthentication = await axios.get(`http://192.168.69.80:3000/equipment/${connection.value}`);
+    const responseAuthentication = await axios.get(`http://192.168.69.80:3000/api/equipment/${connection.value}`);
     authentications.value = responseAuthentication.data || {};
 
     if (authentications.value[0] && authentications.value[0].equipment_id) {
-      const response = await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
+      const response = await axios.post('http://192.168.69.80:3000/api/equipment/execute_command', {
         command: "potency_onu",
         slot: authentications.value[0].slot,
         pon: authentications.value[0].pon,
@@ -97,7 +97,7 @@ async function unprovision_onu(slot, pon, olt_id, equipment_id) {
   showMessageUnprovision.value = false;
 
   try {
-    await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
+    await axios.post('http://192.168.69.80:3000/api/equipment/execute_command', {
       command: "unprovision_onu",
       slot: slot,
       pon: pon,
@@ -136,7 +136,7 @@ async function reboot_onu(slot, pon, olt_id, equipment_id) {
   showMessageReboot.value = false;
 
   try {
-    await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
+    await axios.post('http://192.168.69.80:3000/api/equipment/execute_command', {
       command: "reboot_onu",
       slot: slot,
       pon: pon,
@@ -175,7 +175,7 @@ async function management_onu(equipment) {
   showMessageManagement.value = false;
 
   try {
-    const response = await axios.post('http://192.168.69.80:3000/equipment/execute_command', {
+    const response = await axios.post('http://192.168.69.80:3000/api/equipment/execute_command', {
       command: "management_onu",
       sernum: equipment
     });
@@ -378,7 +378,8 @@ const statusFATClass = (fat) => {
                 <h1 class="font-extrabold">Dados de Fatura</h1>
               </div>
               <div class="cursor-pointer" @click="toggle">
-                <font-awesome-icon class="font-bold" :icon="isExpanded ? ['fas', 'chevron-up'] : ['fas', 'chevron-down']"/>
+                <font-awesome-icon class="font-bold"
+                                   :icon="isExpanded ? ['fas', 'chevron-up'] : ['fas', 'chevron-down']"/>
               </div>
             </div>
             <div v-if="isExpanded">
@@ -416,7 +417,8 @@ const statusFATClass = (fat) => {
                   <h1 class="font-extrabold">Aberturas de Atendimento</h1>
                 </div>
                 <div class="cursor-pointer" @click="toggleAtt">
-                  <font-awesome-icon class="font-bold" :icon="isExpandedAtt ? ['fas', 'chevron-up'] : ['fas', 'chevron-down']"/>
+                  <font-awesome-icon class="font-bold"
+                                     :icon="isExpandedAtt ? ['fas', 'chevron-up'] : ['fas', 'chevron-down']"/>
                 </div>
               </div>
               <div v-if="isExpandedAtt">
@@ -495,8 +497,15 @@ const statusFATClass = (fat) => {
               </div>
               <div class="mr-8" v-if="rxSignalLevel">
                 <p class="font-bold">Potência da ONU</p>
-                <p>{{ rxSignalLevel }}</p>
+                <p v-bind:class="{
+                      'text-red': parseFloat(rxSignalLevel) < -25,
+                      'text-green': parseFloat(rxSignalLevel) > -24,
+                      'text-yellow': parseFloat(rxSignalLevel) == -24
+                    }">
+                  {{ rxSignalLevel }}
+                </p>
               </div>
+
               <div class="mr-8" v-else>
                 <p class="font-bold">Potência da ONU</p>
                 <p>DOWN</p>
@@ -628,10 +637,17 @@ const statusFATClass = (fat) => {
 
 .text-green {
   color: green;
+  font-weight: 700;
 }
 
 .text-red {
   color: red;
+  font-weight: 700;
+}
+
+.text-yellow {
+  color: yellow;
+  font-weight: 700;
 }
 
 </style>

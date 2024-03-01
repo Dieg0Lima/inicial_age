@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from '@/api/axios';
+import axiosInstance from '@/api/axios';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -17,7 +17,7 @@ const connectionId = route.params.connectionId;
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`/valid_olts`);
+    const response = await axiosInstance.get(`/valid_olts`);
     valid_olt.value = response.data;
   } catch (error) {
     console.error("Erro ao buscar a lista de OLTs:", error);
@@ -29,7 +29,7 @@ async function unprovision_list(id) {
   isLoading.value = true;
 
   try {
-    const response = await axios.post('/equipment/execute_command', {
+    const response = await axiosInstance.post('/equipment/execute_command', {
       command: "unprovision_list",
       id: id
     });
@@ -47,7 +47,7 @@ async function availability_pon(slot, pon, index) {
   isLoading.value = true;
 
   try {
-    const response = await axios.post('/equipment/execute_command', {
+    const response = await axiosInstance.post('/equipment/execute_command', {
       command: "availability_pon",
       slot: slot,
       pon: pon,
@@ -74,7 +74,7 @@ async function provision_onu(index, port, slot, pon, serial) {
 
   selectedItemIndex.value = index;
   try {
-    const response = await axios.post('/equipment/execute_command', {
+    const response = await axiosInstance.post('/equipment/execute_command', {
       command: "provision_onu",
       port: port,
       slot: slot,

@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
-import axios from '@/api/axios';
+import axiosInstance from '@/api/axios';
 import {format} from 'date-fns';
 import AgeLogoLoading from "@/components/_fragments/Loading/AgeLogoLoading.vue";
 // import ConfirmModal from "@/components/_fragments/modal/ConfirmModal.vue";
@@ -28,7 +28,7 @@ onMounted(async () => {
   loading.value = true
 
   try {
-    const response = await axios.get(`/contracts/${contractNumber.value}/details`, {
+    const response = await axiosInstance.get(`/contracts/${contractNumber.value}/details`, {
       params: {
         equipment_serial_number: equipmentSerial.value,
         connection: connection.value,
@@ -42,7 +42,7 @@ onMounted(async () => {
   }
 
   try {
-    const responseFAT = await axios.get(`/financial_info/${contractNumber.value}`);
+    const responseFAT = await axiosInstance.get(`/financial_info/${contractNumber.value}`);
     FAT.value = responseFAT.data || {};
   } catch (error) {
     console.error("Erro ao buscar informações financeiras:", error);
@@ -50,7 +50,7 @@ onMounted(async () => {
   }
 
   try {
-    const responseAssignments = await axios.get(`/assignments/${contractNumber.value}`);
+    const responseAssignments = await axiosInstance.get(`/assignments/${contractNumber.value}`);
     assignments.value = responseAssignments.data || [];
   } catch (error) {
     console.error("Erro ao buscar as atribuições:", error);
@@ -58,11 +58,11 @@ onMounted(async () => {
   }
 
   try {
-    const responseAuthentication = await axios.get(`/equipment/${connection.value}`);
+    const responseAuthentication = await axiosInstance.get(`/equipment/${connection.value}`);
     authentications.value = responseAuthentication.data || {};
 
     if (authentications.value[0] && authentications.value[0].equipment_id) {
-      const response = await axios.post('/equipment/execute_command', {
+      const response = await axiosInstance.post('/equipment/execute_command', {
         command: "potency_onu",
         slot: authentications.value[0].slot,
         pon: authentications.value[0].pon,
@@ -97,7 +97,7 @@ async function unprovision_onu(slot, pon, olt_id, equipment_id) {
   showMessageUnprovision.value = false;
 
   try {
-    await axios.post('/equipment/execute_command', {
+    await axiosInstance.post('/equipment/execute_command', {
       command: "unprovision_onu",
       slot: slot,
       pon: pon,

@@ -50,7 +50,7 @@ const fetchContract = async (page = 1) => {
       [searchType]: searchTerm.value,
       page: page
     };
-    const response = await axios.get(`https://ageatende/contracts`, { params });
+    const response = await axios.get(`/contracts`, { params });
     contracts.value = response.data.contracts;
     currentPage.value = response.data.meta.current_page;
     totalPages.value = response.data.meta.total_pages;

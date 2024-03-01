@@ -136,7 +136,7 @@ async function reboot_onu(slot, pon, olt_id, equipment_id) {
   showMessageReboot.value = false;
 
   try {
-    await axios.post('/equipment/execute_command', {
+    await axiosInstance.post('/equipment/execute_command', {
       command: "reboot_onu",
       slot: slot,
       pon: pon,
@@ -175,7 +175,7 @@ async function management_onu(equipment) {
   showMessageManagement.value = false;
 
   try {
-    const response = await axios.post('/equipment/execute_command', {
+    const response = await axiosInstance.post('/equipment/execute_command', {
       command: "management_onu",
       sernum: equipment
     });

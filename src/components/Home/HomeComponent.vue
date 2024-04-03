@@ -3,13 +3,12 @@
 </script>
 
 <template>
-  <div class="page-container">
-
-
+  <div class="bg-white page-container">
+    <img src="@/assets/ellipses/Ellipse-1.png" alt="">
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .page-container {
   width: 100vw;
   height: 100vh;

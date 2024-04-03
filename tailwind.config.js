@@ -4,6 +4,28 @@ module.exports = {
   presets: [],
   darkMode: 'media', // or 'class'
   theme: {
+    extend: {
+      colors: {
+        'age-colorOrange': '#FF5200',
+        'age-colorLightOrangeHover': '#FF5E11',
+        'age-colorYellow': '#FDA000',
+        'age-colorDarkBlue': '#0F295E',
+        'age-colorRed': '#DE221C',
+        'age-colorLightGray': '#B6B5B5',
+        'age-colorBlack': '#1F1F39',
+        'age-colorDarkGray': '#38385E',
+        'age-colorMidGray': '#78789D',
+        'age-colorPurpleGray': '#B8B8D2',
+        'age-colorWhiteSmoke': '#F4F3FD',
+        'age-colorOffWhite': '#F9F9FB',
+        'age-colorPureWhite': '#FFFFFF',
+        'age-colorDarkPurple': '#46369F',
+        'age-colorLightPurple': '#6E6BE8',
+        'age-colorLightOrange': '#FFD6BB',
+        'age-colorLightingOrange': '#FEF6F2',
+        'age-colorVeryLightBlue': '#ECFCFF',
+      },
+    },
     accentColor: ({ theme }) => ({
       ...theme('colors'),
       auto: 'auto',

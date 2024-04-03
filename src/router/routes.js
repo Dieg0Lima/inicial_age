@@ -1,45 +1,67 @@
 import LoginPage from "@/views/LoginPage.vue";
 import DefaultLayout from "@/layout/DefaultLayout.vue";
-import AttendantRouter from "@/components/Attendant/AttendantRouter.vue";
 import HomeComponent from "@/components/Home/HomeComponent.vue";
-import DetailComponent from "@/components/Attendant/DetailComponent.vue";
+// import DetailComponent from "@/components/Attendant/DetailComponent.vue";
+import AttendantPage from "@/views/attendant/AttendantPage.vue";
 import ReportRouter from "@/components/Report/ReportRouter.vue";
 import OltListComponent from "@/components/OLTs/OltListComponent.vue";
+import SearchPage from "@/views/searchClient/searchClientView.vue"
 
 const routes = [
   {
-    path: '/login',
+    path: "/login",
     component: LoginPage,
   },
   {
-    path: '/',
+    path: "",
+    requiresAuth: true,
+  },
+  {
+    path: "/",
     component: DefaultLayout,
+    requiresAuth: true,
     children: [
       {
-        path: '/inicio',
+        path: "/inicio",
         component: HomeComponent,
+        meta: {
+          inicioSelected: true,
+          requiresAuth: true,
+        },
       },
       {
-        path: '/atendimento/inicio',
-        component: AttendantRouter,
+        path: "/atendimento/inicio",
+        component: SearchPage,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
-        path: '/atendimento/:id2/:id1/',
-        name: 'detalhes-contrato',
-        component: DetailComponent,
+        path: "/atendimento/conexão/",
+        component: AttendantPage,
         props: true,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
-        path: '/atendimento/olt/:contractId/:connectionId',
+        path: "/atendimento/olt/:contractId/:connectionId",
         component: OltListComponent,
-        name: 'olt-list',
+        name: "olt-list",
         props: true,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
-        path: 'relatorio/inicio',
+        path: "relatorio/inicio",
         component: ReportRouter,
+        meta: {
+          requiresAuth: true,
+        },
       },
-    ]
+    ],
   },
 ];
+
 export default routes;

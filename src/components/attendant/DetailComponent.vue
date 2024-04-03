@@ -28,7 +28,7 @@ onMounted(async () => {
   loading.value = true
 
   try {
-    const response = await axios.get(`http://192.168.69.80:3000/api/contracts/${contractNumber.value}/details`, {
+    const response = await axios.get(`http://ageatende/api/contracts/${contractNumber.value}/details`, {
       params: {
         equipment_serial_number: equipmentSerial.value,
         connection: connection.value,
@@ -42,7 +42,7 @@ onMounted(async () => {
   }
 
   try {
-    const responseFAT = await axios.get(`http://192.168.69.80:3000/api/financial_info/${contractNumber.value}`);
+    const responseFAT = await axios.get(`http://ageatende/api/financial_info/${contractNumber.value}`);
     FAT.value = responseFAT.data || {};
   } catch (error) {
     console.error("Erro ao buscar informações financeiras:", error);
@@ -50,7 +50,7 @@ onMounted(async () => {
   }
 
   try {
-    const responseAssignments = await axios.get(`http://192.168.69.80:3000/api/assignments/${contractNumber.value}`);
+    const responseAssignments = await axios.get(`http://ageatende/api/assignments/${contractNumber.value}`);
     assignments.value = responseAssignments.data || [];
   } catch (error) {
     console.error("Erro ao buscar as atribuições:", error);
@@ -58,11 +58,11 @@ onMounted(async () => {
   }
 
   try {
-    const responseAuthentication = await axios.get(`http://192.168.69.80:3000/api/equipment/${connection.value}`);
+    const responseAuthentication = await axios.get(`http://ageatende/api/equipment/${connection.value}`);
     authentications.value = responseAuthentication.data || {};
 
     if (authentications.value[0] && authentications.value[0].equipment_id) {
-      const response = await axios.post('http://192.168.69.80:3000/api/equipment/execute_command', {
+      const response = await axios.post('http://ageatende/api/equipment/execute_command', {
         command: "potency_onu",
         slot: authentications.value[0].slot,
         pon: authentications.value[0].pon,

@@ -6,6 +6,6 @@ export function authGuard(to, from, next) {
   if (store.isAuthenticated) {
     next();
   } else {
-    next('/');
+    next('/login');
   }
 }

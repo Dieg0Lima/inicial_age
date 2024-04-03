@@ -1,59 +1,105 @@
 <template>
-  <div class="w-20 bg-white text-white h-screen with-right-border flex flex-col">
-    <div class="bg-white border-b p-5">
-      <img src="@/assets/icons/AgeLogo.svg" alt="">
+  <div
+    class="w-16 bg-white text-white rounded-2xl h-full with-right-border flex flex-col"
+  >
+    <div class="flex justify-center items-center p-4 mb-10">
+      <LogoAge class="w-full" />
     </div>
-    <nav class="mt-4 mb-auto">
-      <ul class="text-center">
-<!--        <li class="mb-4">-->
-<!--          <router-link to="/inicio" class="text-gray-900 hover:bg-gray-200 p-4 block">-->
-<!--            <font-awesome-icon :icon="['fas', 'home']" />-->
-<!--          </router-link>-->
-<!--        </li>-->
-        <li class="mb-4">
-          <router-link to="/atendimento/inicio" class="text-gray-900 hover:bg-gray-200 p-4 block">
-            <font-awesome-icon :icon="['fas', 'headset']" />
-          </router-link>
-        </li>
-<!--        <li class="mb-4">-->
-<!--          <router-link to="/relatorio/inicio" class="text-gray-900 hover:bg-gray-200 p-4 block">-->
-<!--            <font-awesome-icon :icon="['fas', 'paste']" />-->
-<!--          </router-link>-->
-<!--        </li>-->
-      </ul>
+    <nav class="flex flex-col items-center mb-auto">
+      <div class="items w-full">
+        <router-link
+          class="cursor-pointer relative"
+          to="/inicio"
+          :class="{ selected: isSelected('/inicio') }"
+        >
+          <div class="icon-wrapper">
+            <div class="flex justify-center items-center">
+              <HomeIcon class="w-8" />
+            </div>
+            <div
+              class="selected-bar"
+              v-if="isSelected('/inicio')"
+              :class="{ 'show-bar': isSelected('/inicio') }"
+            ></div>
+          </div>
+        </router-link>
+      </div>
+
+      <div class="items w-full">
+        <router-link
+          class="cursor-pointer relative"
+          to="/atendimento/inicio"
+          :class="{ selected: isSelected('/atendimento') }"
+        >
+          <div class="icon-wrapper">
+            <div class="flex justify-center items-center">
+              <SearchIcon class="w-8" />
+            </div>
+            <div
+              class="selected-bar"
+              v-if="isSelected('/atendimento')"
+              :class="{ 'show-bar': isSelected('/atendimento') }"
+            ></div>
+          </div>
+        </router-link>
+      </div>
     </nav>
-    <nav>
-      <ul class="text-center">
-        <li class="mb-4">
-          <router-link to="/login" class="text-gray-900 hover:bg-gray-200 p-4 block">
-            <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
-          </router-link>
-        </li>
-      </ul>
-    </nav>
+    <div>
+      <div class="cursor-pointer text-black" @click="logout">
+        <div class="flex justify-center items-center">
+          <LogoutIcon class="w-6 mb-4" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
+import { useRoute } from 'vue-router';
+import LogoAge from "@/assets/logos/logoAge.vue";
+import HomeIcon from "@/assets/icons/homeLogo.vue";
+import SearchIcon from "@/assets/icons/searchClient.vue";
+import LogoutIcon from "@/assets/icons/logoutIcon.vue"
+import { useAuthStore } from "@/stores/authStore";
 
-library.add(fas);
+const route = useRoute();
+const authStore = useAuthStore();
+
+const isSelected = (path) => {
+    const isCurrentRoute = route.path === path || route.path.startsWith(path);
+    return isCurrentRoute;
+};
+
+const logout = () => {
+  authStore.logout();
+};
+
 </script>
 
-<style scoped>
-.with-right-border {
-  border-right: 2px solid #e1e1e1;
+<style lang="scss" scoped>
+.bg {
+  background-color: $background-color;
 }
 
-.border-b {
-  border-bottom: 2px solid #e1e1e1;
+nav .items {
+  margin-bottom: 40px;
 }
 
-.nav li {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.icon-wrapper {
+  position: relative;
+}
+
+.selected-bar {
+  position: absolute;
+  top: 0;
+  border-radius: 5px 0 0 5px;
+  left: 95%;
+  width: 0px;
+  height: 100%;
+  background-color: $primary-color;
+}
+
+.show-bar {
+  width: 4px;
 }
 </style>

@@ -17,8 +17,6 @@ export const useSearchStore = defineStore("searchStore", {
       this.responseMessage = "";
       const authStore = useAuthStore();
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
       authStore.loadToken();
 
       try {

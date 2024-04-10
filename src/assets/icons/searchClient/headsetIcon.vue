@@ -14,11 +14,11 @@
 svg {
   transition: all 0.3s ease-in-out;
   cursor: pointer;
-  fill: #B9B9B9;
+  fill: #FFFFFF;
 
   &:hover {
     transform: scale(1.1);
-    fill: $primary-color; 
+    fill: $secondary-color; 
   }
 }
 </style>

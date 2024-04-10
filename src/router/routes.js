@@ -2,7 +2,7 @@ import LoginPage from "@/views/LoginPage.vue";
 import DefaultLayout from "@/layout/DefaultLayout.vue";
 import HomeComponent from "@/components/Home/HomeComponent.vue";
 // import DetailComponent from "@/components/Attendant/DetailComponent.vue";
-import AttendantPage from "@/views/attendant/AttendantPage.vue";
+import ClientDetails from "@/views/attendant/ClientDetailsPage.vue";
 import ReportRouter from "@/components/Report/ReportRouter.vue";
 import OltListComponent from "@/components/OLTs/OltListComponent.vue";
 import SearchPage from "@/views/searchClient/searchClientView.vue"
@@ -37,9 +37,10 @@ const routes = [
         },
       },
       {
-        path: "/atendimento/conexão/",
-        component: AttendantPage,
-        props: true,
+        path: '/atendimento/detalhes',
+        name: 'client-details',
+        component: ClientDetails,
+        props: (route) => ({ details: route.query.details ? JSON.parse(route.query.details) : {} }),
         meta: {
           requiresAuth: true,
         },

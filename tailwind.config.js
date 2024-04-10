@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'age-colorOrange': '#FF5200',
+        'age-colorOrange': '#FF8B3D',
         'age-colorLightOrangeHover': '#FF5E11',
         'age-colorYellow': '#FDA000',
         'age-colorDarkBlue': '#0F295E',
@@ -24,6 +24,8 @@ module.exports = {
         'age-colorLightOrange': '#FFD6BB',
         'age-colorLightingOrange': '#FEF6F2',
         'age-colorVeryLightBlue': '#ECFCFF',
+        'age-colorLightGreen': '#90CA54',
+        'age-colorGreen': '#5F9E1E',
       },
     },
     accentColor: ({ theme }) => ({

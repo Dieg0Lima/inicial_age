@@ -11,20 +11,21 @@
         <div
           v-for="(result, index) in paginatedResults"
           :key="index"
-          class="flex flex-col space-y-4 border p-6 shadow rounded-lg bg-white"
+          class="flex flex-col space-y-4 border shadow rounded-lg bg-white p-2"
         >
-          <div class="flex flex-row justify-between">
+          <div
+            class="flex flex-row justify-between bg-age-colorOrange p-6 rounded-2xl"
+          >
             <div class="flex flex-row items-center space-x-6">
-              <div class="w-5">
-                <clientIcon class="" />
-              </div>
-              <h1 class="font-bold text-lg">Dados do cliente</h1>
+              <h1 class="font-bold text-xl text-white">Dados da conexão</h1>
             </div>
-            <div class="flex flex-row items-center space-x-10">
-              <router-link to="/atendimento/conexão"
-                ><div class="w-6 cursor-pointer">
-                  <infoIcon class="" /></div
-              ></router-link>
+            <div class="flex flex-row items-center space-x-8">
+              <div
+                class="w-6 cursor-pointer"
+                @click="fetchClientDetails(result.id)"
+              >
+                <infoIcon class="" />
+              </div>
 
               <div class="w-6 cursor-pointer">
                 <headsetIcon class="" />
@@ -32,7 +33,7 @@
             </div>
           </div>
           <div class="flex flex-row">
-            <div class="w-full space-y-4 ml-12 mr-12">
+            <div class="w-full space-y-4 ml-6 mr-6">
               <div>
                 <h1 class="font-semibold">Nome</h1>
                 <span>{{ result.name }}</span>
@@ -87,7 +88,7 @@
               </div>
             </div>
           </div>
-          <div class="ml-12">
+          <div class="ml-6 mr-6 pb-4">
             <h1 class="font-semibold">Descrição</h1>
             <span>{{ result.description }}</span>
           </div>
@@ -118,27 +119,39 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useSearchStore } from "@/stores/searchStore";
-
-import clientIcon from "@/assets/icons/searchClient/clientIcon.vue";
+import { useClientDetailsStore } from "@/stores/clientDetailsStore"
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 import infoIcon from "@/assets/icons/searchClient/infoIcon.vue";
 import headsetIcon from "@/assets/icons/searchClient/headsetIcon.vue";
+
+const router = useRouter();
+const toast = useToast();
 
 const searchStore = useSearchStore();
 const searchResults = computed(() => searchStore.results);
 const hasResults = computed(() => searchResults.value.length > 0);
 const currentPage = ref(1);
 const itemsPerPage = ref(4);
-
 const paginatedResults = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
   return searchResults.value.slice(start, end);
 });
+const totalPages = computed(() => Math.ceil(searchResults.value.length / itemsPerPage.value));
 
-const totalPages = computed(() => {
-  return Math.ceil(searchResults.value.length / itemsPerPage.value);
-});
+const clientDetailsStore = useClientDetailsStore();
+
+const fetchClientDetails = async (id) => {
+  await clientDetailsStore.fetchDetails(id);
+  if (clientDetailsStore.error) {
+    toast.error(clientDetailsStore.error.message);
+  } else {
+    router.push({ name: "client-details", query: { details: JSON.stringify(clientDetailsStore.results[0]) } });
+  }
+};
 </script>
+
 
 <style scoped>
 .custom-grid {

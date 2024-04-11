@@ -54,12 +54,30 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from "vue";
 import billetIlustration from "@/assets/ilustrations/attendant/billetIlustration.vue";
-import { defineProps, computed } from "vue";
 import financialIlustration from "@/assets/ilustrations/attendant/financialIlustration.vue";
+import { useToast } from "vue-toastification";
 
-const props = defineProps({
-  financial: Array,
+const financialData = ref([]);
+const toast = useToast();
+
+onMounted(() => {
+  const storedData = localStorage.getItem("clientDetails");
+  if (storedData) {
+    console.log(storedData)
+
+    const parsedData = JSON.parse(storedData);
+    const financialDataFromStored = parsedData.data?.financial;
+
+    if (financialDataFromStored) {
+      financialData.value = financialDataFromStored;
+    } else {
+      toast.error("Dados financeiros não encontrados.");
+    }
+  } else {
+    toast.error("Nenhum dado para Faturas encontrado.");
+  }
 });
 
 const currentDate = new Date();
@@ -70,7 +88,7 @@ const getStatus = (item) => {
     return "paid";
   } else if (expirationDate < currentDate) {
     return "expired";
-  } else if (expirationDate > currentDate) {
+  } else if (expirationDate >= currentDate) {
     return "open";
   } else {
     return "pending";
@@ -78,12 +96,11 @@ const getStatus = (item) => {
 };
 
 const financialWithStatus = computed(() => {
-  return props.financial.map((item) => ({
+  return financialData.value.map((item) => ({
     ...item,
     status: getStatus(item),
   }));
 });
-
 </script>
 
 <style lang="scss" scoped></style>

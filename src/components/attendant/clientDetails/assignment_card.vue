@@ -56,61 +56,64 @@
       </div>
       <div
         v-if="selectedReport && selectedReport.length > 0"
-        class="report-details w-full h-96 overflow-scroll p-6 flex flex-col space-x-2"
+        class="report-details w-full h-96 overflow-scroll p-6 flex flex-row space-x-2"
       >
-        <div
-          v-for="report in selectedReport"
-          :key="report.report_id"
-          class="rounded-lg flex flex-col w-1/2 h-full"
-        >
+        <div class="w-1/2 flex flex-col">
           <div
-            class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
+            v-for="report in selectedReport"
+            :key="report.report_id"
+            class="rounded-lg flex flex-col w-full h-full space-y-2"
           >
-            <div class="flex flex-row items-center space-x-4">
-              <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
-              <h1 class="font-bold">Histórico de solicitação</h1>
-            </div>
-            <div class="flex flex-row items-center justify-between">
-              <img
-                src="@/assets/icons/attendant/shareIcon.png"
-                class="w-4 h-4"
-                alt=""
-              />
-              <h4 class="font-semibold text-sm">
-                #{{ report.report_id }} | {{ report.report_title }}
-              </h4>
+            <div
+              class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
+            >
+              <div class="flex flex-row items-center space-x-4">
+                <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
+                <h1 class="font-bold">Histórico de solicitação</h1>
+              </div>
+              <div class="flex flex-row items-center">
+                <img
+                  src="@/assets/icons/attendant/shareIcon.png"
+                  class="w-4 h-4"
+                  alt=""
+                />
+                <h4 class="font-semibold text-sm">
+                  #{{ report.report_id }} | {{ report.report_title }}
+                </h4>
+              </div>
               <div
-                class="bg-white border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs"
+                class="bg-white w-1/2 border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs justify-center"
               >
                 <span class="p-1 font-bold text-age-colorOrange">{{
                   report.report_beginning_date
                 }}</span>
               </div>
-            </div>
-            <div
-              class="flex flex-row items-center justify-between pb-6 border-b-2 border-solid border-slate-300"
-            >
-              <div class="flex flex-col text-sm">
-                <span class="text-gray-500 font-medium"
-                  >De: {{ report.report_person }}</span
-                >
+              <div
+                class="flex flex-row items-center justify-between pb-6 border-b-2 border-solid border-slate-300"
+              >
+                <div class="flex flex-col text-sm">
+                  <span class="text-gray-500 font-medium"
+                    >De: {{ report.report_person }}</span
+                  >
+                </div>
+                <div class="text-sm">
+                  <span class="text-gray-500 font-medium">{{
+                    report.report_team
+                  }}</span>
+                </div>
               </div>
-              <div class="text-sm">
-                <span class="text-gray-500 font-medium">{{
-                  report.report_team
-                }}</span>
+              <div class="flex flex-col">
+                <h4 class="font-semibold text-sm">
+                  {{ report.report_title }}
+                </h4>
+                <h4 class="text-gray-500 font-medium text-sm">
+                  {{ report.report_description }}
+                </h4>
               </div>
-            </div>
-            <div class="flex flex-col">
-              <h4 class="font-semibold text-sm">
-                {{ report.report_title }}
-              </h4>
-              <h4 class="text-gray-500 font-medium text-sm">
-                {{ report.report_description }}
-              </h4>
             </div>
           </div>
         </div>
+
         <div
           v-for="incident in selectedAssignment.incidents"
           :key="incident.incident_id"

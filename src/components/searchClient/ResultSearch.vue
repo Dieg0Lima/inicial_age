@@ -119,13 +119,13 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useSearchStore } from "@/stores/searchStore";
-import { useClientDetailsStore } from "@/stores/clientDetailsStore"
-import { useRouter } from "vue-router";
+import { useClientDetailsStore } from "@/stores/clientDetailsStore";
+// import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import infoIcon from "@/assets/icons/searchClient/infoIcon.vue";
 import headsetIcon from "@/assets/icons/searchClient/headsetIcon.vue";
 
-const router = useRouter();
+// const router = useRouter();
 const toast = useToast();
 
 const searchStore = useSearchStore();
@@ -138,20 +138,24 @@ const paginatedResults = computed(() => {
   const end = start + itemsPerPage.value;
   return searchResults.value.slice(start, end);
 });
-const totalPages = computed(() => Math.ceil(searchResults.value.length / itemsPerPage.value));
+const totalPages = computed(() =>
+  Math.ceil(searchResults.value.length / itemsPerPage.value)
+);
 
 const clientDetailsStore = useClientDetailsStore();
 
-const fetchClientDetails = async (id) => {
-  await clientDetailsStore.fetchDetails(id);
+import { useRouter } from "vue-router";
+
+const fetchClientDetails = async (clientId) => {
+  await clientDetailsStore.fetchDetails(clientId);
   if (clientDetailsStore.error) {
     toast.error(clientDetailsStore.error.message);
   } else {
-    router.push({ name: "client-details", query: { details: JSON.stringify(clientDetailsStore.results[0]) } });
+    const router = useRouter();
+    router.push({ name: "client-details", params: { clientId } });
   }
 };
 </script>
-
 
 <style scoped>
 .custom-grid {

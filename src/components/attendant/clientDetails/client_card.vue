@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white border-solid border-2 border-slate-200 rounded-xl p-2">
-    <div
+    <!-- <div
       class="w-full flex flex-row items-center space-x-4 bg-age-colorOrange rounded-xl"
     >
       <div class="mb-[-50px]"><userIlustration class="p-2" /></div>
@@ -43,37 +43,56 @@
           <span> {{ props.client.address_complement || "Sem complemento cadastrado"}} </span>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
-import { computed } from "vue";
-import userIlustration from "@/assets/ilustrations/attendant/userIlustration.vue";
+import { ref, onMounted } from "vue";
 
-const props = defineProps({
-  client: {
-    type: Object,
-    default: () => ({ tx_id: "" }),
-  },
+const client = ref(null);
+
+onMounted(() => {
+  openIndexedDB()
+    .then((db) => {
+      const transaction = db.transaction(["clientDetails"], "readonly");
+      const objectStore = transaction.objectStore("clientDetails");
+
+      const request = objectStore.get(props.clientId);
+
+      request.onsuccess = (event) => {
+        const clientData = event.target.result;
+        client.value = clientData.data;
+      };
+
+      request.onerror = (event) => {
+        console.error("Erro ao obter dados do cliente:", event.target.error);
+      };
+    })
+    .catch((error) => {
+      console.error("Erro ao abrir IndexedDB:", error);
+    });
 });
 
-const formattedTxId = computed(() => {
-  const value = props.client.tx_id;
-  if (!value) return "";
-  const cleanValue = value.toString().replace(/\D/g, "");
+function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("ageAtendeDB", 1);
 
-  if (cleanValue.length === 11) {
-    return cleanValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  } else if (cleanValue.length === 14) {
-    return cleanValue.replace(
-      /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-      "$1.$2.$3/$4-$5"
-    );
-  }
-  return value;
-});
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      db.createObjectStore("clientDetails", { keyPath: "id" });
+    };
+
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      resolve(db);
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
 </script>
 
 <style lang="scss" scoped></style>

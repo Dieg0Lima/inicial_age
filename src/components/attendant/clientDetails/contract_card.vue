@@ -54,26 +54,32 @@
 </template>
 
 <script setup>
+import { ref, onMounted, computed } from "vue";
 import contractIlustration from "@/assets/ilustrations/attendant/contractIlustration.vue";
-import { computed, defineProps } from "vue";
+import { useToast } from "vue-toastification";
 
-const props = defineProps({
-  contract: {
-    type: Object,
-    default: () => ({ final_date: "", status: "" }),
-  },
+const contractData = ref(null);
+const toast = useToast();
+
+onMounted(() => {
+  const storedData = localStorage.getItem("clientDetails");
+  if (storedData) {
+    console.log(storedData)
+  } else {
+    toast.error("Nenhum dado de contrato encontrado.");
+  }
 });
 
 const statusColorClass = computed(() => {
-  return props.contract.status === "Bloqueio Financeiro" ||
-    props.contract.status === "Cancelado" ||
-    props.contract.status === "Bloqueio Administrativo"
+  return contractData.value.status === "Bloqueio Financeiro" ||
+    contractData.value.status === "Cancelado" ||
+    contractData.value.status === "Bloqueio Administrativo"
     ? "bg-red-500"
     : "bg-age-colorLightGreen";
 });
 
 const formattedDate = computed(() => {
-  const date = new Date(props.contract.final_date);
+  const date = new Date(contractData.value.final_date);
   if (!isNaN(date.getTime())) {
     let day = date.getDate().toString().padStart(2, "0");
     let month = (date.getMonth() + 1).toString().padStart(2, "0");

@@ -36,10 +36,10 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.length === 0) { 
-    next('/inicio'); 
+  if (to.matched.length === 0) {
+    next('/inicio');
   } else {
-    next(); 
+    next();
   }
 });
 

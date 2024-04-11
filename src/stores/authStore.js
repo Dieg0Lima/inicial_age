@@ -18,7 +18,7 @@ export const useAuthStore = defineStore("authStore", {
       try {
         await delay(1000);
         const response = await axios.post(
-          "http://192.168.69.80:3000/signin/login",
+          "http://192.168.1.30:3000/signin/login",
           payload
         );
         this.token = response.data.token;

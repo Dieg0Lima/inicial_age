@@ -2,7 +2,8 @@ import router from "../router";
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://192.168.69.80:3000/',
+    baseURL: 'http://192.168.1.30:3000'
+    ,
 });
 
 axiosInstance.interceptors.request.use(

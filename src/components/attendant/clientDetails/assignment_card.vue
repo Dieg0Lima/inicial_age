@@ -14,10 +14,12 @@
             Aberturas de atendimento
           </div>
         </div>
-        <div class="flex items-center justify-center space-x-2">
+        <div class="flex">
           <div
-            class="flex items-center justify-center bg-white w-full h-12 space-x-6 rounded-xl text-sm"
+            class="flex items-center bg-white w-full h-12 space-x-2 rounded-xl text-sm"
           >
+            <homeIcon class="cursor-pointer p-4" @click="cleanProtocol" />
+
             <button
               :disabled="currentIndex === 0"
               @click="moveLeft"
@@ -26,14 +28,22 @@
               &#8592;
             </button>
             <div
-              class="font-semibold text-white cursor-pointer hover:bg-orange-100 p-2 rounded-lg"
+              class="font-semibold text-white cursor-pointer p-2 rounded-lg"
+              :class="
+                selectedProtocolId.value ===
+                protocol.incidents[0].incident_protocol
+                  ? 'bg-age-colorOrange'
+                  : 'hover:bg-orange-100'
+              "
               v-for="protocol in visibleItems"
               :key="protocol.incidents[0].incident_protocol"
+              @click="selectProtocol(protocol.incidents[0].incident_protocol)"
             >
               <span class="text-black">{{
                 protocol.incidents[0].incident_protocol
               }}</span>
             </div>
+
             <button
               :disabled="currentIndex >= assignment.length - 3"
               @click="moveRight"
@@ -44,9 +54,97 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-row w-full h-full text-sm">
+      <div
+        v-if="selectedReport && selectedReport.length > 0"
+        class="report-details w-full h-96 overflow-scroll p-6 flex flex-col space-x-2"
+      >
         <div
-          class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll pb-6 space-y-1"
+          v-for="report in selectedReport"
+          :key="report.report_id"
+          class="rounded-lg flex flex-col w-1/2 h-full"
+        >
+          <div
+            class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
+          >
+            <div class="flex flex-row items-center space-x-4">
+              <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
+              <h1 class="font-bold">Histórico de solicitação</h1>
+            </div>
+            <div class="flex flex-row items-center justify-between">
+              <img
+                src="@/assets/icons/attendant/shareIcon.png"
+                class="w-4 h-4"
+                alt=""
+              />
+              <h4 class="font-semibold text-sm">
+                #{{ report.report_id }} | {{ report.report_title }}
+              </h4>
+              <div
+                class="bg-white border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs"
+              >
+                <span class="p-1 font-bold text-age-colorOrange">{{
+                  report.report_beginning_date
+                }}</span>
+              </div>
+            </div>
+            <div
+              class="flex flex-row items-center justify-between pb-6 border-b-2 border-solid border-slate-300"
+            >
+              <div class="flex flex-col text-sm">
+                <span class="text-gray-500 font-medium"
+                  >De: {{ report.report_person }}</span
+                >
+              </div>
+              <div class="text-sm">
+                <span class="text-gray-500 font-medium">{{
+                  report.report_team
+                }}</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <h4 class="font-semibold text-sm">
+                {{ report.report_title }}
+              </h4>
+              <h4 class="text-gray-500 font-medium text-sm">
+                {{ report.report_description }}
+              </h4>
+            </div>
+          </div>
+        </div>
+        <div
+          v-for="incident in selectedAssignment.incidents"
+          :key="incident.incident_id"
+          class="rounded-lg flex flex-col space-x-2 w-1/2"
+        >
+          <div
+            class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
+          >
+            <div class="flex flex-row items-center space-x-4">
+              <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
+              <h1 class="font-bold">{{ incident.incident_type }}</h1>
+            </div>
+
+            <div class="flex flex-col justify-between pb-6">
+              <div class="flex flex-col text-sm">
+                <span class="font-medium"> Descrição</span>
+              </div>
+              <div class="text-sm">
+                <span class="text-gray-500 font-medium">{{
+                  incident.incident_description
+                }}</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <h4 class="font-semibold text-sm"></h4>
+              <h4 class="text-gray-500 font-medium text-sm"></h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="flex flex-row w-full h-full text-sm">
+        <div
+          class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll"
         >
           <div
             v-for="item in formattedAssignments"
@@ -102,6 +200,7 @@ import { defineProps, computed } from "vue";
 import { ref } from "vue";
 
 import assignmentIlustration from "@/assets/ilustrations/attendant/assignmentIlustration.vue";
+import homeIcon from "@/assets/icons/attendant/homeIcon.vue";
 
 const props = defineProps({
   assignment: Array,
@@ -140,6 +239,35 @@ const moveLeft = () => {
 const moveRight = () => {
   if (currentIndex.value < props.assignment.length - 3) currentIndex.value += 3;
 };
+
+const selectedProtocolId = ref(0);
+const selectedReport = ref(null);
+
+function cleanProtocol() {
+  selectedProtocolId.value = 0;
+  selectedReport.value = null;
+}
+
+function selectProtocol(protocolId) {
+  console.log("Selected Protocol ID:", protocolId, typeof protocolId);
+  selectedProtocolId.value = protocolId;
+  const assignment = props.assignment.find((assignment) =>
+    assignment.incidents.some(
+      (incident) => incident.incident_protocol === protocolId
+    )
+  );
+  if (assignment && assignment.reports) {
+    selectedReport.value = assignment.reports;
+  } else {
+    selectedReport.value = null;
+  }
+}
+
+const selectedAssignment = computed(() => {
+  return formattedAssignments.value.length > 0
+    ? formattedAssignments.value[0]
+    : null;
+});
 </script>
 
 <style lang="scss" scoped></style>

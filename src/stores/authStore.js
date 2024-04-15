@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+import axiosInstance from "@/api/axios";
 import router from "../router";
 import { useToast } from "vue-toastification";
 
@@ -17,8 +17,8 @@ export const useAuthStore = defineStore("authStore", {
 
       try {
         await delay(1000);
-        const response = await axios.post(
-          "http://192.168.1.30:3000/signin/login",
+        const response = await axiosInstance.post(
+          "/signin/login",
           payload
         );
         this.token = response.data.token;

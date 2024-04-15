@@ -18,23 +18,31 @@
         <div v-if="currentPage === 'form'" class="w-full">
           <form
             @submit.prevent="submitForm"
-            class="flex flex-col pt-8 space-y-6 w-full"
+            class="flex flex-col items-end pt-8 space-y-6 w-full"
           >
             <input
-              class="p-2 border border-solid border-slate-200 rounded-md"
+              class="p-2 border w-full border-solid border-slate-200 rounded-md"
               type="text"
-              v-model="equipment"
-              placeholder="Equipamento"
+              v-model="formData.equipment"
+              placeholder="Equipamento do cliente"
               required
             />
+
             <input
-              class="p-2 border border-solid border-slate-200 rounded-md"
+              class="p-2 border w-full border-solid border-slate-200 rounded-md"
               type="text"
-              v-model="ceo"
-              placeholder="CEO"
+              v-model="formData.cto"
+              placeholder="CTO"
               required
             />
-            <div class="flex flex-col items-end w-full"></div>
+            <button
+              v-if="currentPage.value !== 'oltList'"
+              class="bg-age-colorOrange items-end justify-end text-white font-bold p-2 rounded-xl hover:bg-age-colorLightOrangeHover w-4/12"
+              type="submit"
+              @click="submitForm"
+            >
+              Próximo
+            </button>
           </form>
         </div>
         <div v-else class="h-96 overflow-scroll w-full p-2">
@@ -64,16 +72,6 @@
             <span class="font-semibold">{{ olt.olt_name }}</span>
           </div>
         </div>
-        <div class="w-full flex justify-end pt-6">
-          <button
-            v-if="currentPage.value !== 'oltList'"
-            class="bg-age-colorOrange items-end justify-end text-white font-bold p-2 rounded-xl hover:bg-age-colorLightOrangeHover w-4/12"
-            type="submit"
-            @click="submitProvision"
-          >
-            Próximo
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -82,24 +80,34 @@
 <script setup>
 import { defineEmits, defineProps, ref, computed } from "vue";
 import { useClientProvisionStore } from "@/stores/clientProvisionStore";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const props = defineProps({
   isVisible: Boolean,
   olts: Array,
 });
-
 const emit = defineEmits(["update:isVisible"]);
+
 const currentPage = ref("form");
 const clientProvisionStore = useClientProvisionStore();
+const formData = ref({ equipment: "", cto: "" });
 
 function close() {
   emit("update:isVisible", false);
   resetPagination();
 }
 
-function submitProvision() {
-  clientProvisionStore.submitProvision();
-  currentPage.value = "oltList";
+function submitForm() {
+  if (!formData.value.cto || formData.value.equipment === "") {
+    toast.error("Por favor, preencha todos os campos do formulário.");
+    return;
+  } else {
+    const formDataValue = formData.value;
+    clientProvisionStore.submitProvision(formDataValue);
+    currentPage.value = "oltList";
+  }
 }
 
 function resetPagination() {

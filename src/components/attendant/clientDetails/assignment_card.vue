@@ -25,23 +25,34 @@
               @click="moveLeft"
               class="p-4 disabled:opacity-50"
             >
-              &#8592;
+              <i class="fa-solid fa-chevron-left text-age-colorOrange"></i>
             </button>
             <div
-              class="font-semibold text-white cursor-pointer p-2 rounded-lg"
-              :class="
-                selectedProtocolId.value ===
-                protocol.incidents[0].incident_protocol
-                  ? 'bg-age-colorOrange'
-                  : 'hover:bg-orange-100'
-              "
               v-for="protocol in visibleItems"
               :key="protocol.incidents[0].incident_protocol"
+              class="font-semibold text-white cursor-pointer p-2 rounded-lg item"
+              :class="{
+                'bg-age-colorOrange':
+                  selectedProtocolId.value ===
+                  protocol.incidents[0].incident_protocol,
+                'hover:bg-orange-100':
+                  selectedProtocolId.value !==
+                  protocol.incidents[0].incident_protocol,
+              }"
               @click="selectProtocol(protocol.incidents[0].incident_protocol)"
             >
-              <span class="text-black">{{
-                protocol.incidents[0].incident_protocol
-              }}</span>
+              <span
+                :class="{
+                  'text-white':
+                    selectedProtocolId.value ===
+                    protocol.incidents[0].incident_protocol,
+                  'text-black':
+                    selectedProtocolId.value !==
+                    protocol.incidents[0].incident_protocol,
+                }"
+              >
+                {{ protocol.incidents[0].incident_protocol }}
+              </span>
             </div>
 
             <button
@@ -49,68 +60,71 @@
               @click="moveRight"
               class="p-4 disabled:opacity-50"
             >
-              &#8594;
+              <i class="fa-solid fa-chevron-right text-age-colorOrange"></i>
             </button>
           </div>
         </div>
       </div>
       <div
         v-if="selectedReport && selectedReport.length > 0"
-        class="report-details w-full h-96 overflow-scroll p-6 flex flex-col space-x-2"
+        class="report-details w-full h-96 overflow-scroll p-6 flex flex-row space-x-2"
       >
-        <div
-          v-for="report in selectedReport"
-          :key="report.report_id"
-          class="rounded-lg flex flex-col w-1/2 h-full"
-        >
+        <div class="flex flex-col w-1/2 space-y-3">
           <div
-            class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
+            v-for="report in selectedReport"
+            :key="report.report_id"
+            class="rounded-lg flex flex-col w-full h-full"
           >
-            <div class="flex flex-row items-center space-x-4">
-              <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
-              <h1 class="font-bold">Histórico de solicitação</h1>
-            </div>
-            <div class="flex flex-row items-center justify-between">
-              <img
-                src="@/assets/icons/attendant/shareIcon.png"
-                class="w-4 h-4"
-                alt=""
-              />
-              <h4 class="font-semibold text-sm">
-                #{{ report.report_id }} | {{ report.report_title }}
-              </h4>
-              <div
-                class="bg-white border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs"
-              >
-                <span class="p-1 font-bold text-age-colorOrange">{{
-                  report.report_beginning_date
-                }}</span>
-              </div>
-            </div>
             <div
-              class="flex flex-row items-center justify-between pb-6 border-b-2 border-solid border-slate-300"
+              class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
             >
-              <div class="flex flex-col text-sm">
-                <span class="text-gray-500 font-medium"
-                  >De: {{ report.report_person }}</span
+              <div class="flex flex-row items-center space-x-4">
+                <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
+                <h1 class="font-bold">Histórico de solicitação</h1>
+              </div>
+              <div class="flex flex-row items-center justify-between">
+                <img
+                  src="@/assets/icons/attendant/shareIcon.png"
+                  class="w-4 h-4"
+                  alt=""
+                />
+                <h4 class="font-semibold text-sm">
+                  #{{ report.report_id }} | {{ report.report_title }}
+                </h4>
+                <div
+                  class="bg-white border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs"
                 >
+                  <span class="p-1 font-bold text-age-colorOrange">{{
+                    report.report_beginning_date
+                  }}</span>
+                </div>
               </div>
-              <div class="text-sm">
-                <span class="text-gray-500 font-medium">{{
-                  report.report_team
-                }}</span>
+              <div
+                class="flex flex-row items-center justify-between pb-6 border-b-2 border-solid border-slate-300"
+              >
+                <div class="flex flex-col text-sm">
+                  <span class="text-gray-500 font-medium"
+                    >De: {{ report.report_person }}</span
+                  >
+                </div>
+                <div class="text-sm">
+                  <span class="text-gray-500 font-medium">{{
+                    report.report_team
+                  }}</span>
+                </div>
               </div>
-            </div>
-            <div class="flex flex-col">
-              <h4 class="font-semibold text-sm">
-                {{ report.report_title }}
-              </h4>
-              <h4 class="text-gray-500 font-medium text-sm">
-                {{ report.report_description }}
-              </h4>
+              <div class="flex flex-col">
+                <h4 class="font-semibold text-sm">
+                  {{ report.report_title }}
+                </h4>
+                <h4 class="text-gray-500 font-medium text-sm">
+                  {{ report.report_description }}
+                </h4>
+              </div>
             </div>
           </div>
         </div>
+
         <div
           v-for="incident in selectedAssignment.incidents"
           :key="incident.incident_id"
@@ -144,7 +158,7 @@
 
       <div v-else class="flex flex-row w-full h-full text-sm">
         <div
-          class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll"
+          class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll pb-6"
         >
           <div
             v-for="item in formattedAssignments"
@@ -249,7 +263,6 @@ function cleanProtocol() {
 }
 
 function selectProtocol(protocolId) {
-  console.log("Selected Protocol ID:", protocolId, typeof protocolId);
   selectedProtocolId.value = protocolId;
   const assignment = props.assignment.find((assignment) =>
     assignment.incidents.some(

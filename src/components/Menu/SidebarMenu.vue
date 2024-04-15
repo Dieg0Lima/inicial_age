@@ -55,25 +55,24 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute } from "vue-router";
 import LogoAge from "@/assets/logos/logoAge.vue";
 import HomeIcon from "@/assets/icons/homeLogo.vue";
 import SearchIcon from "@/assets/icons/searchClient.vue";
-import LogoutIcon from "@/assets/icons/logoutIcon.vue"
+import LogoutIcon from "@/assets/icons/logoutIcon.vue";
 import { useAuthStore } from "@/stores/authStore";
 
 const route = useRoute();
 const authStore = useAuthStore();
 
 const isSelected = (path) => {
-    const isCurrentRoute = route.path === path || route.path.startsWith(path);
-    return isCurrentRoute;
+  const isCurrentRoute = route.path === path || route.path.startsWith(path);
+  return isCurrentRoute;
 };
 
 const logout = () => {
   authStore.logout();
 };
-
 </script>
 
 <style lang="scss" scoped>

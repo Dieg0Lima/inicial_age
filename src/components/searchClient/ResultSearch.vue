@@ -119,7 +119,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useSearchStore } from "@/stores/searchStore";
-import { useClientDetailsStore } from "@/stores/clientDetailsStore"
+import { useClientDetailsStore } from "@/stores/clientDetailsStore";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import infoIcon from "@/assets/icons/searchClient/infoIcon.vue";
@@ -138,7 +138,9 @@ const paginatedResults = computed(() => {
   const end = start + itemsPerPage.value;
   return searchResults.value.slice(start, end);
 });
-const totalPages = computed(() => Math.ceil(searchResults.value.length / itemsPerPage.value));
+const totalPages = computed(() =>
+  Math.ceil(searchResults.value.length / itemsPerPage.value)
+);
 
 const clientDetailsStore = useClientDetailsStore();
 
@@ -147,11 +149,10 @@ const fetchClientDetails = async (id) => {
   if (clientDetailsStore.error) {
     toast.error(clientDetailsStore.error.message);
   } else {
-    router.push({ name: "client-details", query: { details: JSON.stringify(clientDetailsStore.results[0]) } });
+    router.push({ name: "client-details", params: { id } });
   }
 };
 </script>
-
 
 <style scoped>
 .custom-grid {

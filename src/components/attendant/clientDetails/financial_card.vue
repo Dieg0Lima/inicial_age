@@ -83,7 +83,6 @@ const financialWithStatus = computed(() => {
     status: getStatus(item),
   }));
 });
-
 </script>
 
 <style lang="scss" scoped></style>

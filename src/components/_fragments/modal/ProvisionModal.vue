@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps, ref, computed } from "vue";
+import { defineEmits, defineProps, ref, computed, watch } from "vue";
 import { useClientProvisionStore } from "@/stores/clientProvisionStore";
 import { useToast } from "vue-toastification";
 
@@ -87,12 +87,27 @@ const toast = useToast();
 const props = defineProps({
   isVisible: Boolean,
   olts: Array,
+  connection: Object,
 });
+
 const emit = defineEmits(["update:isVisible"]);
 
 const currentPage = ref("form");
 const clientProvisionStore = useClientProvisionStore();
 const formData = ref({ equipment: "", cto: "" });
+
+watch(
+  () => props.connection,
+  (newVal) => {
+    if (newVal) {
+      formData.value.equipment = newVal.equipment_serial_number || "";
+    } else {
+      console.log("Connection data is not available.");
+      formData.value.equipment = ""; 
+    }
+  },
+  { deep: true, immediate: true }
+);
 
 function close() {
   emit("update:isVisible", false);

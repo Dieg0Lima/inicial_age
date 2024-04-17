@@ -39,6 +39,7 @@
       </div>
     </div>
     <ProvisionModal
+      :connection="clientDetailsStore.connection"
       :isVisible="isModalVisible"
       :olts="olts"
       @update:isVisible="isModalVisible = $event"
@@ -50,6 +51,9 @@
 import { ref } from "vue";
 import axiosInstance from "@/api/axios";
 import ProvisionModal from "@/components/_fragments/modal/ProvisionModal.vue";
+
+import { useClientDetailsStore } from "@/stores/clientDetailsStore";
+const clientDetailsStore = useClientDetailsStore();
 
 const items = ref([
   {

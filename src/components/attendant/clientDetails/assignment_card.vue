@@ -2,7 +2,10 @@
   <div
     class="bg-white border-2 border-solid border-slate-200 rounded-xl flex h-1/2 flex-row overflow-hidden p-2"
   >
-    <div class="w-full h-full flex flex-col">
+    <div
+      class="w-full h-full flex flex-col"
+      v-if="assignment && assignment.length > 0"
+    >
       <div
         class="flex justify-between items-center bg-age-colorOrange border-solid border-b border-slate-200 p-2 rounded-xl space-x-4"
       >
@@ -205,6 +208,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div v-else>
+      <p>Nenhum dado disponível para exibição.</p>
     </div>
   </div>
 </template>

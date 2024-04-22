@@ -4,7 +4,7 @@
       class="w-full h-screen bg-ellipse bg-white flex flex-col overflow-hidden"
     >
       <nav
-        class="flex flex-row items-center justify-between p-4 w-full border-b-2 border-solid border-slate-200"
+        class="flex flex-row items-center justify-between p-4 w-full"
         style="height: 5%; position: relative"
       >
         <div class="space-x-8 pl-8">
@@ -75,7 +75,6 @@ nav {
   align-items: center;
   padding: 4px;
   width: 100%;
-  border-bottom: 2px solid #e2e8f0;
   height: 5%;
   position: relative;
 }

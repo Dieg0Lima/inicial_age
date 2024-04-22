@@ -209,8 +209,32 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      <p>Nenhum dado disponível para exibição.</p>
+    <div v-else class="w-full">
+      <div
+        class="flex justify-between items-center bg-age-colorOrange border-solid border-b border-slate-200 p-2 rounded-xl space-x-4 w-full"
+      >
+        <div class="flex flex-row justify-center items-center">
+          <div class="w-14">
+            <assignmentIlustration />
+          </div>
+          <div class="font-semibold text-xl ml-2 text-white">
+            Aberturas de atendimento
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-center pt-2  text-center">
+        <span class="w-1/2"
+          >Não foi realizado nenhum atendimento. Assim que for efetuado, o
+          atendimento será exibido aqui.</span
+        >
+      </div>
+      <div
+        class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll pb-6 space-y-1"
+      >
+        <div class="w-full h-full flex justify-center items-center">
+          <emptyIlustration />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -219,6 +243,7 @@
 import { defineProps, computed } from "vue";
 import { ref } from "vue";
 
+import emptyIlustration from "@/assets/ilustrations/attendant/emptyIlustration.vue";
 import assignmentIlustration from "@/assets/ilustrations/attendant/assignmentIlustration.vue";
 import homeIcon from "@/assets/icons/attendant/homeIcon.vue";
 

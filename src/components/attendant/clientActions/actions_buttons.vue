@@ -18,7 +18,7 @@
           />
         </div>
 
-        <div class="w-2/3 p-2 flex flex-col justify-around">
+        <div class="w-2/3 p-2 flex flex-col justify-between">
           <div>
             <div class="font-bold">
               {{ item.name }}
@@ -59,39 +59,34 @@ const clientDetailsStore = useClientDetailsStore();
 const items = ref([
   {
     id: 1,
-    name: "Item 1",
+    name: "Provisionamento",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam nisi ea rem ut cupiditate iusto ",
+      "Processo de configuração e ativação de serviços ou equipamentos",
     svg: "check-solid.svg",
     action: "Provision",
   },
   {
     id: 2,
-    name: "Item 2",
-    description: "sla",
-    svg: "check-solid.svg",
+    name: "Desprovisionamento",
+    description:
+      "Processo oposto ao provisionamento e envolve a remoção ou desativação de serviços ou equipamentos",
+    svg: "xmark-solid.svg",
     action: "api/sla/2",
   },
   {
     id: 3,
-    name: "Item 3",
-    description: "sla",
-    svg: "check-solid.svg",
+    name: "Reiniciar equipamento",
+    description: "Processo de desligar e ligar novamente um dispositivo",
+    svg: "rotate-right-solid.svg",
     action: "api/sla/3",
   },
   {
     id: 4,
-    name: "Item 4",
-    description: "sla",
-    svg: "check-solid.svg",
+    name: "Acessar gerência",
+    description:
+      "Acessar gerência na interface de gerenciamento",
+    svg: "gear-solid.svg",
     action: "api/sla/4",
-  },
-  {
-    id: 5,
-    name: "Item 5",
-    description: "sla",
-    svg: "check-solid.svg",
-    action: "api/sla/5",
   },
 ]);
 
@@ -118,7 +113,3 @@ function handleButtonClick(item) {
   }
 }
 </script>
-
-<style scoped>
-/* Adicione estilos adicionais se necessário */
-</style>

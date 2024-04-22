@@ -53,8 +53,25 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      <p>Nenhum dado disponível para exibição.</p>
+    <div v-else class="w-full flex flex-col">
+      <div
+        class="flex items-center bg-age-colorOrange border-solid border-b border-slate-200 p-2 rounded-xl space-x-4 w-full"
+      >
+        <div class="w-14">
+          <billetIlustration />
+        </div>
+        <div class="font-semibold text-xl ml-2 text-white">Dados da fatura</div>
+      </div>
+      <div class="flex justify-center pt-8">
+        <span>Não foi registrado nenhuma fatura.</span>
+      </div>
+      <div
+        class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll pb-6 space-y-1"
+      >
+        <div class="w-full h-full flex justify-center items-center">
+          <emptyIlustration />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -63,6 +80,7 @@
 import billetIlustration from "@/assets/ilustrations/attendant/billetIlustration.vue";
 import { defineProps, computed } from "vue";
 import financialIlustration from "@/assets/ilustrations/attendant/financialIlustration.vue";
+import emptyIlustration from "@/assets/ilustrations/attendant/emptyIlustration.vue";
 
 const props = defineProps({
   financial: Array,

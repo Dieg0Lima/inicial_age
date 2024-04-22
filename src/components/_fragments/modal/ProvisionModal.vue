@@ -24,7 +24,7 @@
         </div>
         <div
           v-if="currentPage === 'confirmation'"
-          class="flex flex-col space-y-4"
+          class="flex flex-col space-y-4 mb-4"
         >
           <h1 class="font-bold text-xl">Confirme os Detalhes</h1>
           <span class="text-gray-400"
@@ -44,7 +44,7 @@
             @click="close"
             class="w-8 flex flex-col justify-center items-center"
           >
-            <i class="fa-solid fa-xmark text-2xl text-gray-700"></i>
+            <i class="fa-solid fa-xmark text-xl text-gray-700"></i>
           </button>
         </div>
       </div>

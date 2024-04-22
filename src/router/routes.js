@@ -2,15 +2,14 @@ import LoginPage from "@/views/LoginPage.vue";
 import DefaultLayout from "@/layout/DefaultLayout.vue";
 import HomeComponent from "@/components/Home/HomeComponent.vue";
 // import DetailComponent from "@/components/Attendant/DetailComponent.vue";
-import ClientLayout from "@/views/attendant/ClientDetailsView.vue"
+import ClientLayout from "@/views/attendant/ClientDetailsView.vue";
 import ClientDetails from "@/views/attendant/ClientDetailsPage.vue";
 import ClientActions from "@/views/attendant/ClientActionsPage.vue";
 import ReportRouter from "@/components/Report/ReportRouter.vue";
 import OltListComponent from "@/components/OLTs/OltListComponent.vue";
-import SearchPage from "@/views/searchClient/searchClientView.vue"
+import SearchPage from "@/views/searchClient/searchClientView.vue";
 
 import { useClientDetailsStore } from "@/stores/clientDetailsStore";
-
 
 const routes = [
   {
@@ -19,12 +18,17 @@ const routes = [
   },
   {
     path: "",
-    requiresAuth: true,
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: "/",
     component: DefaultLayout,
-    requiresAuth: true,
+    meta: {
+      inicioSelected: true,
+      requiresAuth: true,
+    },
     children: [
       {
         path: "/inicio",
@@ -48,14 +52,14 @@ const routes = [
         props: true,
         children: [
           {
-            path: 'detalhes/:id',
-            name: 'client-details',
+            path: "detalhes/:id",
+            name: "client-details",
             beforeEnter: async (to, from, next) => {
               const store = useClientDetailsStore();
               await store.fetchDetails(to.params.id);
 
               if (!store.client) {
-                next('/atendimento/inicio');
+                next("/atendimento/inicio");
               } else {
                 next();
               }
@@ -68,16 +72,15 @@ const routes = [
           },
 
           {
-            path: 'acoes/:id',
-            name: 'client-actions',
+            path: "acoes/:id",
+            name: "client-actions",
             component: ClientActions,
             props: true,
             meta: {
               requiresAuth: true,
             },
           },
-        ]
-
+        ],
       },
 
       {

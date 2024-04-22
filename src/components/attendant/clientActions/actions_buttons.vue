@@ -40,6 +40,7 @@
     </div>
     <ProvisionModal
       :connection="clientDetailsStore.connection"
+      :contract="clientDetailsStore.contract"
       :isVisible="isModalVisible"
       :olts="olts"
       @update:isVisible="isModalVisible = $event"

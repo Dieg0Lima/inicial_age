@@ -21,6 +21,7 @@
           <div
             v-for="item in financialWithStatus"
             :key="item.title_id"
+            @click="selectTitle(item)"
             class="flex flex-row items-center p-2 space-x-2 cursor-pointer border-solid border-b border-slate-200 hover:bg-orange-100 rounded-xl"
           >
             <div class="w-16">
@@ -29,12 +30,12 @@
             <div class="flex flex-row space-x-8">
               <div class="flex flex-col text-sm">
                 <span class="font-semibold">Data do vencimento</span>
-                <span>{{ item.title_expiration_date }}</span>
+                <span>{{ item.formattedDate }}</span>
               </div>
               <div class="flex flex-col text-sm">
                 <span class="font-semibold">Valor</span>
                 <span>{{
-                  `R$ ${parseFloat(item.title_amount).toFixed(2)}`
+                  `R$${parseFloat(item.title_amount).toFixed(2)}`
                 }}</span>
               </div>
               <div class="flex flex-col text-sm">
@@ -45,10 +46,56 @@
           </div>
         </div>
         <div
+          v-if="selectedTitle && selectedTitle.title_amount !== undefined"
           class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll pb-6 space-y-1"
         >
-          <div class="w-full h-full flex justify-center items-center">
-            <img src="@/assets/ilustrations/attendant/workingIn.png" alt="" />
+          <div class="flex flex-col p-4">
+            <span class="text-lg font-semibold">Valor</span>
+            <span class="text-2xl font-bold">{{
+              `R$${parseFloat(selectedTitle.title_amount).toFixed(2)}`
+            }}</span>
+          </div>
+          <div class="flex flex-row w-full p-4">
+            <div class="w-1/2 space-y-8">
+              <div class="flex flex-row space-x-4 items-center">
+                <div class="w-6">
+                  <calendarIcon class="fill-age-colorOrange" />
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-medium text-sm">Data da vigência</span>
+                  <span class="font-bold text-sm">
+                    {{ selectedTitle.formattedDate }}</span
+                  >
+                </div>
+              </div>
+              <div class="flex flex-row space-x-4 items-center">
+                <div class="w-6">
+                  <calendarIcon class="fill-age-colorOrange" />
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-medium text-sm">Data do vencimento</span>
+                  <span class="font-bold text-sm">
+                    {{ selectedTitle.formattedDate }}</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="w-1/2">Teste2</div>
+          </div>
+        </div>
+        <div
+          v-else
+          class="w-full h-96 border-solid border-r border-slate-200 overflow-scroll pb-6 space-y-1"
+        >
+          <div
+            class="w-full h-full flex flex-col p-8 justify-center items-center"
+          >
+            <span class="font-semibold"
+              >Escolha uma fatura para visualizá-la</span
+            >
+            <financialChooseIlustration
+              class="flex justify-center items-center"
+            />
           </div>
         </div>
       </div>
@@ -78,13 +125,21 @@
 
 <script setup>
 import billetIlustration from "@/assets/ilustrations/attendant/billetIlustration.vue";
-import { defineProps, computed } from "vue";
+import { defineProps, computed, ref } from "vue";
 import financialIlustration from "@/assets/ilustrations/attendant/financialIlustration.vue";
+import financialChooseIlustration from "@/assets/ilustrations/attendant/financialChooseIlustration.vue";
 import emptyIlustration from "@/assets/ilustrations/attendant/emptyIlustration.vue";
+import calendarIcon from "@/assets/icons/attendant/calendarIcon.vue";
 
 const props = defineProps({
   financial: Array,
 });
+
+const selectedTitle = ref("");
+
+function selectTitle(title) {
+  selectedTitle.value = title;
+}
 
 const currentDate = new Date();
 
@@ -104,9 +159,21 @@ const getStatus = (item) => {
 const financialWithStatus = computed(() => {
   return props.financial.map((item) => ({
     ...item,
-    status: getStatus(item) || "",
+    status: getStatus(item),
+    formattedDate: formatExpirationDate(item.title_expiration_date),
   }));
 });
+
+function formatExpirationDate(expirationDateStr) {
+  const date = new Date(expirationDateStr);
+  if (!isNaN(date.getTime())) {
+    let day = (date.getDate() + 1).toString().padStart(2, "0");
+    let month = (date.getMonth() + 1).toString().padStart(2, "0");
+    let year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  return "";
+}
 </script>
 
 <style lang="scss" scoped></style>

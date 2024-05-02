@@ -17,9 +17,9 @@
             Aberturas de atendimento
           </div>
         </div>
-        <div class="flex">
+        <div class="w-6/12">
           <div
-            class="flex items-center bg-white w-full h-12 space-x-2 rounded-xl text-sm"
+            class="flex items-center justify-center bg-white w-full h-12 space-x-2 rounded-xl text-sm"
           >
             <homeIcon class="cursor-pointer p-4" @click="cleanProtocol" />
 
@@ -33,7 +33,7 @@
             <div
               v-for="protocol in visibleItems"
               :key="protocol.incidents[0].incident_protocol"
-              class="font-semibold text-white cursor-pointer p-2 rounded-lg item"
+              class="font-semibold text-white cursor-pointer p-2 rounded-lg w-8/12"
               :class="{
                 'bg-age-colorOrange':
                   selectedProtocolId.value ===
@@ -70,53 +70,56 @@
       </div>
       <div
         v-if="selectedReport && selectedReport.length > 0"
-        class="report-details w-full h-96 overflow-scroll p-6 flex flex-row space-x-2"
+        class="report-details w-full h-96 p-2 flex flex-row space-x-2"
       >
-        <div class="flex flex-col w-1/2 space-y-3">
+        <div
+          class="flex flex-col w-full overflow-scroll border-r-2 border-solid border-slate-300 pr-6 mb-6"
+        >
+          <div class="flex flex-row items-center space-x-2 pt-4 pb-4">
+            <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
+            <h1 class="font-semibold text-xl">Histórico de solicitação</h1>
+          </div>
           <div
             v-for="report in selectedReport"
             :key="report.report_id"
-            class="rounded-lg flex flex-col w-full h-full"
+            class="rounded-lg flex flex-col w-full h-full mb-2"
           >
             <div
               class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
             >
-              <div class="flex flex-row items-center space-x-4">
-                <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
-                <h1 class="font-bold">Histórico de solicitação</h1>
-              </div>
-              <div class="flex flex-row items-center justify-between">
-                <img
-                  src="@/assets/icons/attendant/shareIcon.png"
-                  class="w-4 h-4"
-                  alt=""
-                />
-                <h4 class="font-semibold text-sm">
-                  #{{ report.report_id }} | {{ report.report_title }}
-                </h4>
+              <div class="flex flex-col">
                 <div
-                  class="bg-white border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs"
+                  class="flex flex-row items-center space-x-2 justify-between"
                 >
-                  <span class="p-1 font-bold text-age-colorOrange">{{
-                    report.report_beginning_date
-                  }}</span>
+                  <div class="flex flex-row items-center space-x-1">
+                    <h4 class="font-semibold text-sm mr-4">
+                      #{{ report.report_id }} | {{ report.report_title }}
+                    </h4>
+                  </div>
+                  <div
+                    class="bg-white border-2 border-solid border-age-colorOrange rounded-xl flex flex-row text-xs ml-2"
+                  >
+                    <span class="p-1 font-bold text-age-colorOrange text-xs">{{
+                      formatDate(report.report_beginning_date)
+                    }}</span>
+                  </div>
                 </div>
               </div>
               <div
-                class="flex flex-row items-center justify-between pb-6 border-b-2 border-solid border-slate-300"
+                class="flex flex-row items-center justify-between pb-6 space-x-2 border-b-2 border-solid border-slate-300"
               >
                 <div class="flex flex-col text-sm">
                   <span class="text-gray-500 font-medium"
-                    >De: {{ report.report_person }}</span
+                    >De: {{ report.report_person || "Sem pessoa" }}</span
                   >
                 </div>
                 <div class="text-sm">
                   <span class="text-gray-500 font-medium">{{
-                    report.report_team
+                    report.report_team || "Sem equipe"
                   }}</span>
                 </div>
               </div>
-              <div class="flex flex-col">
+              <div class="flex flex-col space-y-2">
                 <h4 class="font-semibold text-sm">
                   {{ report.report_title }}
                 </h4>
@@ -127,33 +130,36 @@
             </div>
           </div>
         </div>
-
-        <div
-          v-for="incident in selectedAssignment.incidents"
-          :key="incident.incident_id"
-          class="rounded-lg flex flex-col space-x-2 w-1/2"
-        >
+        <div class="flex flex-col w-full space-y-3">
           <div
-            class="bg-white border-solid border-2 border-slate-300 rounded-xl p-4 space-y-2"
+            v-if="selectedAssignment"
+            class="flex flex-col w-full h-full overflow-scroll mb-4 ml-4"
           >
-            <div class="flex flex-row items-center space-x-4">
-              <img src="@/assets/icons/attendant/historyIcon.png" alt="" />
-              <h1 class="font-bold">{{ incident.incident_type }}</h1>
-            </div>
-
-            <div class="flex flex-col justify-between pb-6">
-              <div class="flex flex-col text-sm">
-                <span class="font-medium"> Descrição</span>
+            <div
+              v-for="incident in selectedIncident"
+              :key="incident.incident_id"
+              class="rounded-lg flex flex-col space-x-2 w-full"
+            >
+              <div class="flex flex-row items-center space-x-2 pt-4">
+                <div class="w-7">
+                  <networkIcon />
+                </div>
+                <h1 class="font-semibold text-xl">
+                  {{ incident.incident_type }}
+                </h1>
               </div>
-              <div class="text-sm">
-                <span class="text-gray-500 font-medium">{{
-                  incident.incident_description
-                }}</span>
+              <div class="bg-white p-4 space-y-2">
+                <div class="flex flex-col justify-between space-y-2 pb-6">
+                  <div class="flex flex-col">
+                    <span class="font-medium text-lg"> Descrição</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 font-medium text-sm">{{
+                      incident.incident_description
+                    }}</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="flex flex-col">
-              <h4 class="font-semibold text-sm"></h4>
-              <h4 class="text-gray-500 font-medium text-sm"></h4>
             </div>
           </div>
         </div>
@@ -167,6 +173,7 @@
             v-for="item in formattedAssignments"
             :key="item.assignment_id"
             class="flex flex-row items-center p-4 space-x-8 cursor-pointer border-solid border-b border-slate-200 hover:bg-orange-100 rounded-xl"
+            @click="selectProtocol(item.incidents[0].incident_protocol)"
           >
             <div class="flex flex-row space-x-8">
               <div class="w-16 flex justify-center items-center">
@@ -222,7 +229,7 @@
           </div>
         </div>
       </div>
-      <div class="flex justify-center pt-2  text-center">
+      <div class="flex justify-center pt-2 text-center">
         <span class="w-1/2"
           >Não foi realizado nenhum atendimento. Assim que for efetuado, o
           atendimento será exibido aqui.</span
@@ -246,6 +253,7 @@ import { ref } from "vue";
 import emptyIlustration from "@/assets/ilustrations/attendant/emptyIlustration.vue";
 import assignmentIlustration from "@/assets/ilustrations/attendant/assignmentIlustration.vue";
 import homeIcon from "@/assets/icons/attendant/homeIcon.vue";
+import networkIcon from "@/assets/icons/attendant/networkIcon.vue";
 
 const props = defineProps({
   assignment: Array,
@@ -287,6 +295,7 @@ const moveRight = () => {
 
 const selectedProtocolId = ref(0);
 const selectedReport = ref(null);
+const selectedIncident = ref(null);
 
 function cleanProtocol() {
   selectedProtocolId.value = 0;
@@ -302,8 +311,10 @@ function selectProtocol(protocolId) {
   );
   if (assignment && assignment.reports) {
     selectedReport.value = assignment.reports;
+    selectedIncident.value = assignment.incidents;
   } else {
     selectedReport.value = null;
+    selectedIncident.value = null;
   }
 }
 

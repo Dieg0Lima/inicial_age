@@ -7,7 +7,8 @@
         class="flex flex-row border w-full rounded-xl shadow bg-white items-center min-h-[150px]"
       >
         <div
-          class="w-1/3 h-full flex items-center justify-center rounded-xl p-4 bg-age-colorOrange"
+          class="w-1/3 h-full flex items-center justify-center rounded-xl p-4 bg-age-colorOrange cursor-pointer"
+          @click="handleButtonClick(item)"
         >
           <img
             :src="
@@ -41,9 +42,27 @@
     <ProvisionModal
       :connection="clientDetailsStore.connection"
       :contract="clientDetailsStore.contract"
-      :isVisible="isModalVisible"
+      :isVisible="isProvisionVisible"
       :olts="olts"
-      @update:isVisible="isModalVisible = $event"
+      @update:isVisible="isProvisionVisible = $event"
+    />
+
+    <DeprovisionModal
+      :connection="clientDetailsStore.connection"
+      :isVisible="isDeprovisionVisible"
+      @update:isVisible="isDeprovisionVisible = $event"
+    />
+
+    <RebootModal
+      :connection="clientDetailsStore.connection"
+      :isVisible="isRebootVisible"
+      @update:isVisible="isRebootVisible = $event"
+    />
+
+    <ManagementModal
+      :connection="clientDetailsStore.connection"
+      :isVisible="isManagementVisible"
+      @update:isVisible="isManagementVisible = $event"
     />
   </div>
 </template>
@@ -52,6 +71,9 @@
 import { ref } from "vue";
 import axiosInstance from "@/api/axios";
 import ProvisionModal from "@/components/_fragments/modal/ProvisionModal.vue";
+import DeprovisionModal from "@/components/_fragments/modal/DeprovisionModal.vue";
+import RebootModal from "@/components/_fragments/modal/RebootModal.vue";
+import ManagementModal from "@/components/_fragments/modal/ManagementModal.vue";
 
 import { useClientDetailsStore } from "@/stores/clientDetailsStore";
 const clientDetailsStore = useClientDetailsStore();
@@ -71,26 +93,29 @@ const items = ref([
     description:
       "Processo oposto ao provisionamento e envolve a remoção ou desativação de serviços ou equipamentos",
     svg: "xmark-solid.svg",
-    action: "api/sla/2",
+    action: "Deprovision",
   },
   {
     id: 3,
     name: "Reiniciar equipamento",
     description: "Processo de desligar e ligar novamente um dispositivo",
     svg: "rotate-right-solid.svg",
-    action: "api/sla/3",
+    action: "Reboot",
   },
   {
     id: 4,
     name: "Acessar gerência",
-    description:
-      "Acessar gerência na interface de gerenciamento",
+    description: "Acessar gerência na interface de gerenciamento",
     svg: "gear-solid.svg",
-    action: "api/sla/4",
+    action: "Management",
   },
 ]);
 
-const isModalVisible = ref(false);
+const isProvisionVisible = ref(false);
+const isDeprovisionVisible = ref(false);
+const isRebootVisible = ref(false);
+const isManagementVisible = ref(false);
+
 const olts = ref([]);
 
 async function fetchOlts() {
@@ -99,17 +124,50 @@ async function fetchOlts() {
       "/api/v1/provision/list_valid_olts"
     );
     olts.value = response.data;
-    isModalVisible.value = true;
+    isProvisionVisible.value = true;
   } catch (error) {
     console.error("Failed to fetch OLTs:", error);
+  }
+}
+
+async function deprovisionOnu() {
+  try {
+    isDeprovisionVisible.value = true;
+  } catch (error) {
+    console.error("Failed to deprovision ONU:", error);
+  }
+}
+
+async function rebootOnu() {
+  try {
+    isRebootVisible.value = true;
+  } catch (error) {
+    console.error("Failed to deprovision ONU:", error);
+  }
+}
+
+async function managementOnu() {
+  try {
+    isManagementVisible.value = true;
+  } catch (error) {
+    console.error("Failed to deprovision ONU:", error);
   }
 }
 
 function handleButtonClick(item) {
   if (item.action === "Provision") {
     fetchOlts();
+  }
+  if (item.action === "Deprovision") {
+    deprovisionOnu();
+  }
+  if (item.action === "Reboot") {
+    rebootOnu();
+  }
+  if (item.action === "Management") {
+    managementOnu();
   } else {
-    console.log("Esta ação não abre o modal de OLTs.");
+    null
   }
 }
 </script>

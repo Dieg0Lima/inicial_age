@@ -8,9 +8,12 @@
     </div>
     <div class="flex justify-end pt-2">
       <div
-        class="w-44 h-8 bg-age-colorLightGreen rounded-lg flex justify-center items-center"
+        :class="signalBgClass"
+        class="w-44 h-8 rounded-lg flex justify-center items-center"
       >
-        <span class="text-white font-bold">-21,509</span>
+        <img v-if="isLoading" class="w-5" src="@/assets/loadings/potencyLoading.gif" alt="" />
+
+        <span v-else class="text-white font-bold select-text">{{ onuPower.rx_signal_level || "Aguardando" }}</span>
       </div>
     </div>
     <div class="w-full pt-[10px]" style="user-select: text">
@@ -64,16 +67,64 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
-
+import { defineProps, onMounted, reactive, computed, ref } from "vue";
 import connectionIlustration from "@/assets/ilustrations/attendant/connectionIlustration.vue";
+import axiosInstance from "@/api/axios";
 
 const props = defineProps({
   connection: Object,
 });
+
+const onuPower = reactive({
+  rx_signal_level: null,
+});
+
+const signalBgClass = computed(() => {
+  if (onuPower.rx_signal_level >= -24) {
+    return "bg-green-500";
+  } else if (onuPower.rx_signal_level >= -27) {
+    return "bg-yellow-500";
+  } else {
+    return "bg-red-500";
+  }
+});
+
+const isLoading = ref();
+
+onMounted(async () => {
+  isLoading.value = true;
+  try {
+    const requestBody = {
+      olt_id: props.connection.access_point_id,
+      sernum: props.connection.equipment_serial_number,
+      slot: props.connection.slot_olt,
+      pon: props.connection.port_olt,
+      port: props.connection.olt_id,
+    };
+
+    const response = await axiosInstance.post(
+      "/api/v1/potency/fetch_onu_power",
+      requestBody
+    );
+    onuPower.rx_signal_level = response.data.rx_signal_level;
+  } catch (error) {
+    console.error("Erro ao buscar dados: " + error.message);
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
 
 <style lang="scss" scoped>
+.bg-green-500 {
+  background-color: #90ca54;
+}
+.bg-yellow-500 {
+  background-color: #ffeb3b;
+}
+.bg-red-500 {
+  background-color: #f44336;
+}
 .triangle {
   width: 0px;
   height: 0px;

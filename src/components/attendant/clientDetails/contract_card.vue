@@ -41,11 +41,18 @@
         <div class="flex flex-row space-x-6 justify-between">
           <div class="flex flex-col">
             <span class="font-semibold">Inicio da Vigência</span>
-            <span>{{ props.contract.beginning_date }}</span>
+            <span>{{ formattedDate }}</span>
           </div>
           <div class="flex flex-col">
             <span class="font-semibold">Fim da Vigência</span>
-            <span>{{ formattedDate }}</span>
+            <span
+              :class="
+                contractStatus.isFidelizado
+                  ? ' bg-age-colorLightGreen text-white text-center p-1 px-4 rounded-lg font-bold'
+                  : ' bg-red-500 text-white text-center p-1 px-4 rounded-lg font-bold'
+              "
+              >{{ contractStatus.status }}</span
+            >
           </div>
         </div>
       </div>
@@ -72,8 +79,26 @@ const statusColorClass = computed(() => {
     : "bg-age-colorLightGreen";
 });
 
+const contractStatus = computed(() => {
+  const contractDate = new Date(props.contract.final_date);
+  const currentDate = new Date();
+
+  if (contractDate.getFullYear() > (currentDate.getFullYear() + 2)) {
+    return { status: `Não fidelizado`, isFidelizado: false };
+  }
+
+  if (contractDate > currentDate) {
+    let day = contractDate.getDate().toString().padStart(2, "0");
+    let month = (contractDate.getMonth() + 1).toString().padStart(2, "0");
+    let year = contractDate.getFullYear();
+    return { status: `Fidelizado ${day}/${month}/${year}`, isFidelizado: true };
+  }
+
+  return { status: "", isFidelizado: true };
+});
+
 const formattedDate = computed(() => {
-  const date = new Date(props.contract.final_date);
+  const date = new Date(props.contract.beginning_date);
   if (!isNaN(date.getTime())) {
     let day = date.getDate().toString().padStart(2, "0");
     let month = (date.getMonth() + 1).toString().padStart(2, "0");

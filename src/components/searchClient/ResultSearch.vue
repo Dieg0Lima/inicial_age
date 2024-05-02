@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <div class="flex flex-row">
+          <div class="flex flex-row select-text">
             <div class="w-full space-y-4 ml-6 mr-6">
               <div>
                 <h1 class="font-semibold">Nome</h1>

@@ -7,7 +7,16 @@
       <div class="mb-[-50px]"><userIlustration class="p-2" /></div>
       <div class="font-bold text-white text-xl">Dados do cliente</div>
     </div>
-    <div class="w-full pt-[50px]" style="user-select: text">
+    <div class="flex justify-end pt-2">
+      <div
+        :style="{ backgroundColor: insigniaBgColor, color: insigniaFontColor }"
+        class="w-44 h-8 rounded-lg flex justify-center items-center font-bold"
+      >
+        <span>{{ props.client.insignia }}</span>
+      </div>
+    </div>
+
+    <div class="w-full" style="user-select: text">
       <div class="p-4 space-y-4">
         <div class="flex flex-col space-y-2 text-sm">
           <div class="flex flex-col">
@@ -22,6 +31,12 @@
               <span>{{ formattedTxId || "Sem CPF/CNPJ cadastrado" }}</span>
             </div>
           </div>
+        </div>
+        <div class="flex flex-col text-sm">
+          <span class="font-semibold">Email</span>
+          <span>
+            {{ props.client.email || "Sem email cadastrado" }}
+          </span>
         </div>
         <div class="flex flex-col text-sm">
           <span class="font-semibold">Bairro</span>
@@ -68,6 +83,23 @@ const props = defineProps({
     type: Object,
     default: () => ({ tx_id: "" }),
   },
+});
+
+const insigniaBgColor = computed(() => {
+  switch (props.client.insignia) {
+    case "Cliente Ouro":
+      return "#FFD700"; // Gold
+    case "Cliente Prata":
+      return "#C0C0C0"; // Silver
+    case "Cliente Bronze":
+      return "#CD7F32"; // Bronze
+    default:
+      return "#E0E0E0"; // Default gray
+  }
+});
+
+const insigniaFontColor = computed(() => {
+  return props.client.insignia === "Cliente Ouro" ? "#FFFFFF" : "#000000";
 });
 
 const formattedTxId = computed(() => {

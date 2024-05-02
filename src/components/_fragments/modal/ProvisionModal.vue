@@ -1,6 +1,9 @@
 <template>
   <div v-if="isVisible" class="modal">
     <div class="modal-background" @click="close"></div>
+    <div v-if="loading" class="loading-overlay">
+      <img src="@/assets/loadings/rolling.gif" alt="Carregando..." />
+    </div>
     <div class="modal-content w-4/12">
       <div class="modal-header flex flex-row justify-between space-x-8">
         <div v-if="currentPage === 'form'" class="flex flex-col space-y-4">
@@ -69,14 +72,17 @@
               <span class="w-full font-semibold"
                 >Caixa de Transmissão Óptica</span
               >
-
               <input
                 class="p-2 border w-full border-solid border-slate-200 rounded-md"
                 type="text"
                 v-model="formData.cto"
+                :required="!isOptional"
                 placeholder="CTO"
-                required
               />
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" v-model="isOptional" />
+                <span>Não informar CTO</span>
+              </label>
             </div>
 
             <div class="h-full w-full flex flex-row justify-between items-end">
@@ -85,7 +91,6 @@
                 v-if="currentPage.value !== 'oltList'"
                 class="bg-age-colorOrange items-end justify-end text-white font-bold p-2 rounded-xl hover:bg-age-colorLightOrangeHover w-4/12 h-1/2"
                 type="submit"
-                @click="submitForm"
               >
                 Próximo
               </button>
@@ -93,7 +98,7 @@
           </form>
         </div>
         <div v-if="currentPage === 'oltSelection'" class="w-full">
-          <div class="h-96 overflow-scroll w-full">
+          <div class="h-96 overflow-y-scroll w-full">
             <div
               class="w-full px-2 flex flex-row items-center my-4 border border-solid border-slate-200 rounded-md"
             >
@@ -109,7 +114,7 @@
             </div>
 
             <div
-              class="overflow-scroll flex flex-row items-center mb-2 space-x-2 cursor-pointer hover:bg-amber-100"
+              class="flex flex-row items-center mb-2 space-x-2 cursor-pointer hover:bg-amber-100"
               v-for="olt in filteredOlts"
               :key="olt.id"
               @click="selectedOlt = { olt: olt.id, olt_name: olt.olt_name }"
@@ -161,6 +166,7 @@ import { useClientProvisionStore } from "@/stores/clientProvisionStore";
 import { useToast } from "vue-toastification";
 import modalIlustration from "@/assets/ilustrations/attendant/modalIlustration.vue";
 import router from "@/router";
+import axiosInstance from "@/api/axios";
 
 const toast = useToast();
 const props = defineProps({
@@ -170,11 +176,16 @@ const props = defineProps({
   contract: Object,
 });
 
+const loading = ref(false);
+
 const emit = defineEmits(["update:isVisible"]);
 const formData = reactive({
   equipment: "",
   cto: "",
 });
+
+const isOptional = ref(false);
+
 const selectedOlt = ref({ olt: null, olt_name: "" });
 const currentPage = ref("form");
 const clientProvisionStore = useClientProvisionStore();
@@ -199,17 +210,53 @@ function close() {
   resetPagination();
 }
 
-function submitForm() {
+async function submitForm() {
   if (!validateForm()) return;
-  currentPage.value =
-    currentPage.value === "form" ? "oltSelection" : "confirmation";
+
+  if (currentPage.value === "form") {
+    if (!isOptional.value && formData.cto) {
+      const isCTOValid = await validateCTO(formData.cto);
+      if (!isCTOValid) {
+        toast.error("A CTO inserida é inválida.");
+        return;
+      }
+    }
+    currentPage.value = "oltSelection";
+  } else if (currentPage.value === "oltSelection") {
+    currentPage.value = "confirmation";
+  }
+}
+
+async function validateCTO(cto) {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1/validate/validate_cto?cto=${encodeURIComponent(cto)}`
+    );
+    const isValid = response.data.isValid;
+    if (isValid) {
+      toast.success("CTO Validada com sucesso.");
+    } else {
+      toast.error("A CTO inserida é inválida.");
+    }
+    return isValid;
+  } catch (error) {
+    console.error("Erro ao validar CTO:", error);
+    return false;
+  }
 }
 
 function validateForm() {
-  if (currentPage.value === "form" && (!formData.cto || !formData.equipment)) {
-    toast.error("Por favor, preencha todos os campos do formulário.");
-    return false;
+  if (currentPage.value === "form") {
+    if (!isOptional.value && !formData.cto) {
+      toast.error("Por favor, preencha todos os campos do formulário.");
+      return false;
+    }
+    if (!formData.equipment) {
+      toast.error("Por favor, preencha o campo 'Equipamento'.");
+      return false;
+    }
   }
+
   if (
     currentPage.value === "oltSelection" &&
     (!selectedOlt.value || !selectedOlt.value.olt)
@@ -217,10 +264,13 @@ function validateForm() {
     toast.error("Por favor, selecione uma OLT.");
     return false;
   }
+
   return true;
 }
 
 const finalSubmit = () => {
+  loading.value = true;
+
   const submissionData = {
     equipment: formData.equipment,
     cto: formData.cto,
@@ -232,7 +282,11 @@ const finalSubmit = () => {
   clientProvisionStore
     .submitProvision(submissionData)
     .then(() => {
-      router.push(`/atendimento/inicio/`);
+      loading.value = false;
+
+      router.push(
+        `/atendimento/detalhes/` + props.connection.authentication_id
+      );
     })
     .catch((error) => {
       console.error("Falha ao submeter os dados. Tente novamente.", error);
@@ -275,5 +329,18 @@ const filteredOlts = computed(() => {
   padding: 20px;
   border-radius: 10px;
   z-index: 10;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: 20;
 }
 </style>

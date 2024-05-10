@@ -51,7 +51,7 @@
         >
           <div class="flex flex-col p-4">
             <span class="text-lg font-semibold">Valor</span>
-            <span class="text-2xl font-bold">{{
+            <span class="text-2xl font-extrabold">{{
               `R$${parseFloat(selectedTitle.title_amount).toFixed(2)}`
             }}</span>
           </div>
@@ -62,8 +62,8 @@
                   <calendarIcon class="fill-age-colorOrange" />
                 </div>
                 <div class="flex flex-col">
-                  <span class="font-medium text-sm">Data da vigência</span>
-                  <span class="font-bold text-sm">
+                  <span class="font-medium text-xs">Data da vigência</span>
+                  <span class="font-bold text-xs">
                     {{ selectedTitle.formattedDate }}</span
                   >
                 </div>
@@ -73,14 +73,44 @@
                   <calendarIcon class="fill-age-colorOrange" />
                 </div>
                 <div class="flex flex-col">
-                  <span class="font-medium text-sm">Data do vencimento</span>
-                  <span class="font-bold text-sm">
+                  <span class="font-medium text-xs">Data do vencimento</span>
+                  <span class="font-bold text-xs">
                     {{ selectedTitle.formattedDate }}</span
                   >
                 </div>
               </div>
             </div>
-            <div class="w-1/2">Teste2</div>
+            <div class="w-1/2 space-y-8">
+              <div
+                class="flex flex-row space-x-2 items-center"
+                @click="sendInvoiceToWhatsApp"
+              >
+                <div class="w-8">
+                  <whatsappIcon
+                    class="fill-age-colorOrange w-full cursor-pointer"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-bold text-xs">Whatsapp</span>
+                  <span class="font-medium text-xs"
+                    >Enviar fatura do cliente</span
+                  >
+                </div>
+              </div>
+              <!-- <div class="flex flex-row space-x-2 items-center">
+                <div class="w-8">
+                  <emailIcon
+                    class="fill-age-colorOrange w-full cursor-pointer"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-bold text-xs">E-mail</span>
+                  <span class="font-medium text-xs">
+                    Enviar fatura do cliente</span
+                  >
+                </div>
+              </div> -->
+            </div>
           </div>
         </div>
         <div
@@ -130,6 +160,8 @@ import financialIlustration from "@/assets/ilustrations/attendant/financialIlust
 import financialChooseIlustration from "@/assets/ilustrations/attendant/financialChooseIlustration.vue";
 import emptyIlustration from "@/assets/ilustrations/attendant/emptyIlustration.vue";
 import calendarIcon from "@/assets/icons/attendant/calendarIcon.vue";
+import whatsappIcon from "@/assets/icons/attendant/whatsAppIcon.vue";
+// import emailIcon from "@/assets/icons/attendant/emailIcon.vue";
 
 const props = defineProps({
   financial: Array,
@@ -174,6 +206,42 @@ function formatExpirationDate(expirationDateStr) {
   }
   return "";
 }
+
+import { useToast } from 'vue-toastification';
+import { useClientDetailsStore } from '@/stores/clientDetailsStore';
+import axiosInstance from '@/api/axios';
+
+const clientDetailsStore = useClientDetailsStore();
+
+function sendInvoiceToWhatsApp() {
+  const toast = useToast();
+  const client = clientDetailsStore.client;
+
+  if (client) {
+    const invoiceData = {
+      billet_id: selectedTitle.value.title_id,
+      to: client.cell_phone_1,
+      client: client.name,
+    };
+
+    axiosInstance
+      .post("/api/v1/send_billet/whatsapp", invoiceData)
+      .then((response) => {
+        console.log(response.data);
+        toast.success("Fatura enviada com sucesso via WhatsApp");
+      })
+      .catch((error) => {
+        console.error(error);
+        console.error(invoiceData)
+        toast.error("Erro ao enviar fatura via WhatsApp");
+      });
+  } else {
+    console.error("Nenhum cliente disponível");
+    toast.error("Nenhum cliente disponível para enviar a fatura");
+  }
+}
+
+
 </script>
 
 <style lang="scss" scoped></style>

@@ -87,19 +87,28 @@ const props = defineProps({
 
 const insigniaBgColor = computed(() => {
   switch (props.client.insignia) {
-    case "Cliente Ouro":
-      return "#FFD700"; // Gold
-    case "Cliente Prata":
-      return "#C0C0C0"; // Silver
-    case "Cliente Bronze":
-      return "#CD7F32"; // Bronze
+    case "Ouro":
+      return "#FFD700";
+    case "Prata":
+      return "#C0C0C0";
+    case "Bronze":
+      return "#CD7F32";
+    case "Diamante":
+      return "#70d1f4";
     default:
-      return "#E0E0E0"; // Default gray
+      return "#E0E0E0";
   }
 });
 
 const insigniaFontColor = computed(() => {
-  return props.client.insignia === "Cliente Ouro" ? "#FFFFFF" : "#000000";
+  if (
+    props.client.insignia === "Cliente Ouro" ||
+    props.client.insignia === "Diamante"
+  ) {
+    return "#FFFFFF";
+  } else {
+    return "#000000";
+  }
 });
 
 const formattedTxId = computed(() => {

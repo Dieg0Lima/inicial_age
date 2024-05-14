@@ -84,9 +84,10 @@
               <div
                 class="flex flex-row space-x-2 items-center"
                 @click="sendInvoiceToWhatsApp"
+                :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
               >
                 <div class="w-8">
-                  <whatsappIcon
+                  <whatsapp-icon
                     class="fill-age-colorOrange w-full cursor-pointer"
                   />
                 </div>
@@ -207,41 +208,50 @@ function formatExpirationDate(expirationDateStr) {
   return "";
 }
 
-import { useToast } from 'vue-toastification';
-import { useClientDetailsStore } from '@/stores/clientDetailsStore';
-import axiosInstance from '@/api/axios';
+import { useToast } from "vue-toastification";
+import { useClientDetailsStore } from "@/stores/clientDetailsStore";
+import axiosInstance from "@/api/axios";
 
+const isLoading = ref(false);
 const clientDetailsStore = useClientDetailsStore();
 
 function sendInvoiceToWhatsApp() {
   const toast = useToast();
   const client = clientDetailsStore.client;
 
-  if (client) {
-    const invoiceData = {
-      billet_id: selectedTitle.value.title_id,
-      to: client.cell_phone_1,
-      client: client.name,
-    };
-
-    axiosInstance
-      .post("/api/v1/send_billet/whatsapp", invoiceData)
-      .then((response) => {
-        console.log(response.data);
-        toast.success("Fatura enviada com sucesso via WhatsApp");
-      })
-      .catch((error) => {
-        console.error(error);
-        console.error(invoiceData)
-        toast.error("Erro ao enviar fatura via WhatsApp");
-      });
-  } else {
+  if (!client) {
     console.error("Nenhum cliente disponível");
     toast.error("Nenhum cliente disponível para enviar a fatura");
+    return;
   }
+
+  if (isLoading.value) {
+    toast.error("Aguarde, o envio já está em andamento");
+    return;
+  }
+
+  isLoading.value = true;
+  const invoiceData = {
+    billet_id: selectedTitle.value.title_id,
+    to: client.cell_phone_1,
+    client: client.name,
+  };
+
+  axiosInstance
+    .post("/api/v1/send_billet/whatsapp", invoiceData)
+    .then((response) => {
+      console.log(response.data);
+      toast.success("Fatura enviada com sucesso via WhatsApp");
+    })
+    .catch((error) => {
+      console.error(error);
+      console.error(invoiceData);
+      toast.error("Erro ao enviar fatura via WhatsApp");
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 }
-
-
 </script>
 
 <style lang="scss" scoped></style>

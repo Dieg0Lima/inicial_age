@@ -38,7 +38,9 @@ export const useClientDetailsStore = defineStore("clientDetailsStore", {
         this.contract = contract;
         this.app = app;
         this.financial = financial;
-        this.assignment = assignment;
+        this.assignment = assignment.assignments; 
+        this.totalAssignmentsCount = assignment.total_assignments_count; 
+        this.recentAssignmentsCount = assignment.recent_assignments_count; 
         this.responseMessage = "Dados carregados com sucesso!";
         this.error = null;
       } catch (error) {

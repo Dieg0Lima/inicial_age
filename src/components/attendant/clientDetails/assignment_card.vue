@@ -7,64 +7,36 @@
       v-if="assignment && assignment.length > 0"
     >
       <div
-        class="flex justify-between items-center bg-age-colorOrange border-solid border-b border-slate-200 p-2 rounded-xl space-x-4"
+        class="flex flex-col justify-between items-center bg-age-colorOrange border-solid border-b border-slate-200 p-2 rounded-xl space-x-4"
       >
-        <div class="flex flex-row justify-center items-center">
-          <div class="w-14">
-            <assignmentIlustration />
+        <div class="flex flex-row justify-between items-center w-full">
+          <div class="flex flex-row justify-center items-center">
+            <div class="w-14">
+              <assignmentIlustration />
+            </div>
+            <div class="font-semibold text-xl ml-2 text-white">
+              Aberturas de atendimento
+            </div>
           </div>
-          <div class="font-semibold text-xl ml-2 text-white">
-            Aberturas de atendimento
+          <div class="w-6/12">
+            <div
+              class="flex items-center justify-around bg-white w-full h-12 space-x-2 rounded-xl text-sm"
+            >
+              <div class="flex flex-row items-center space-x-4">
+                <span class="text-age-colorOrange font-bold text-lg"
+                  >{{ totalAssignmentsCount }} Atendimentos totais</span
+                >
+              </div>
+
+              <home-icon class="cursor-pointer p-4" @click="cleanProtocol" />
+            </div>
           </div>
         </div>
-        <div class="w-6/12">
-          <div
-            class="flex items-center justify-center bg-white w-full h-12 space-x-2 rounded-xl text-sm"
-          >
-            <homeIcon class="cursor-pointer p-4" @click="cleanProtocol" />
+        <div v-if="recentAssignmentsCount > 0" class="pt-2 p-2">
+          <div class="flex flex-row space-x-2 items-center">
+            <alertAssignment />
 
-            <button
-              :disabled="currentIndex === 0"
-              @click="moveLeft"
-              class="p-4 disabled:opacity-50"
-            >
-              <i class="fa-solid fa-chevron-left text-age-colorOrange"></i>
-            </button>
-            <div
-              v-for="protocol in visibleItems"
-              :key="protocol.incidents[0].incident_protocol"
-              class="font-semibold text-white cursor-pointer p-2 rounded-lg w-8/12"
-              :class="{
-                'bg-age-colorOrange':
-                  selectedProtocolId.value ===
-                  protocol.incidents[0].incident_protocol,
-                'hover:bg-orange-100':
-                  selectedProtocolId.value !==
-                  protocol.incidents[0].incident_protocol,
-              }"
-              @click="selectProtocol(protocol.incidents[0].incident_protocol)"
-            >
-              <span
-                :class="{
-                  'text-white':
-                    selectedProtocolId.value ===
-                    protocol.incidents[0].incident_protocol,
-                  'text-black':
-                    selectedProtocolId.value !==
-                    protocol.incidents[0].incident_protocol,
-                }"
-              >
-                {{ protocol.incidents[0].incident_protocol }}
-              </span>
-            </div>
-
-            <button
-              :disabled="currentIndex >= assignment.length - 3"
-              @click="moveRight"
-              class="p-4 disabled:opacity-50"
-            >
-              <i class="fa-solid fa-chevron-right text-age-colorOrange"></i>
-            </button>
+            <span class=" text-white font-bold text-lg">{{ recentAssignmentsCount }} Visitas técnicas nos últimos 30 dias</span>
           </div>
         </div>
       </div>
@@ -249,11 +221,19 @@
 <script setup>
 import { defineProps, computed } from "vue";
 import { ref } from "vue";
+import { useClientDetailsStore } from "@/stores/clientDetailsStore";
 
 import emptyIlustration from "@/assets/ilustrations/attendant/emptyIlustration.vue";
 import assignmentIlustration from "@/assets/ilustrations/attendant/assignmentIlustration.vue";
 import homeIcon from "@/assets/icons/attendant/homeIcon.vue";
+import alertAssignment from "@/assets/icons/attendant/alertAssignment.vue";
+
 import networkIcon from "@/assets/icons/attendant/networkIcon.vue";
+
+const store = useClientDetailsStore();
+const totalAssignmentsCount = ref(store.totalAssignmentsCount);
+
+const recentAssignmentsCount = ref(store.recentAssignmentsCount);
 
 const props = defineProps({
   assignment: Array,
@@ -278,20 +258,6 @@ const formattedAssignments = computed(() => {
     conclusion_date: formatDate(item.conclusion_date),
   }));
 });
-
-const currentIndex = ref(0);
-
-const visibleItems = computed(() => {
-  return props.assignment.slice(currentIndex.value, currentIndex.value + 3);
-});
-
-const moveLeft = () => {
-  if (currentIndex.value > 0) currentIndex.value -= 3;
-};
-
-const moveRight = () => {
-  if (currentIndex.value < props.assignment.length - 3) currentIndex.value += 3;
-};
 
 const selectedProtocolId = ref(0);
 const selectedReport = ref(null);

@@ -87,11 +87,11 @@ const props = defineProps({
 
 const insigniaBgColor = computed(() => {
   switch (props.client.insignia) {
-    case "Ouro":
+    case "Cliente Ouro":
       return "#FFD700";
     case "Prata":
       return "#C0C0C0";
-    case "Bronze":
+    case "Cliente bronze":
       return "#CD7F32";
     case "Diamante":
       return "#70d1f4";
@@ -103,7 +103,8 @@ const insigniaBgColor = computed(() => {
 const insigniaFontColor = computed(() => {
   if (
     props.client.insignia === "Cliente Ouro" ||
-    props.client.insignia === "Diamante"
+    props.client.insignia === "Diamante" || 
+    props.client.insignia === "Cliente bronze"
   ) {
     return "#FFFFFF";
   } else {

@@ -11,9 +11,16 @@
         :class="signalBgClass"
         class="w-44 h-8 rounded-lg flex justify-center items-center"
       >
-        <img v-if="isLoading" class="w-5" src="@/assets/loadings/potencyLoading.gif" alt="" />
+        <img
+          v-if="isLoading"
+          class="w-5"
+          src="@/assets/loadings/potencyLoading.gif"
+          alt=""
+        />
 
-        <span v-else class="text-white font-bold select-text">{{ onuPower.rx_signal_level || "Aguardando" }}</span>
+        <span v-else class="text-white font-bold select-text">{{
+          onuPower.rx_signal_level || "Aguardando"
+        }}</span>
       </div>
     </div>
     <div class="w-full pt-[10px]" style="user-select: text">
@@ -61,6 +68,16 @@
             }}</span>
           </div>
         </div>
+        <div class="flex justify-end pt-2">
+          <div
+            :class="[
+              'h-8 rounded-lg flex justify-center items-center text-white pl-8 pr-8 font-bold',
+              statusColorClass,
+            ]"
+          >
+            {{ formattedTitle }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -70,6 +87,20 @@
 import { defineProps, onMounted, reactive, computed, ref } from "vue";
 import connectionIlustration from "@/assets/ilustrations/attendant/connectionIlustration.vue";
 import axiosInstance from "@/api/axios";
+
+const statusColorClass = computed(() => {
+  const title = props.connection.authentication_address_list_title;
+  return title === "Bloqueio Financeiro" ||
+    title === "Aviso_Bloqueio" ||
+    title === "Bloqueio Administrativo"
+    ? "bg-red-500"
+    : "bg-age-colorLightGreen";
+});
+
+const formattedTitle = computed(() => {
+  const title = props.connection.authentication_address_list_title;
+  return title === "Aviso_Bloqueio" ? "Aviso de Redução de Velocidade" : title;
+});
 
 const props = defineProps({
   connection: Object,

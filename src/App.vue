@@ -1,14 +1,16 @@
 <template>
-  <div class="no-select" id="app">
-    <router-view />
-  </div>
+  <a-config-provider :locale="locale">
+    <div class="no-select" id="app">
+      <router-view />
+    </div>
+  </a-config-provider>
 </template>
 
-<script>
-export default {
-  name: "App",
-  components: {},
-};
+<script setup>
+import { ref } from "vue";
+import ptBR from "ant-design-vue/es/locale/pt_BR";
+
+const locale = ref(ptBR);
 </script>
 
 <style>

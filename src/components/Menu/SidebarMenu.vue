@@ -43,6 +43,42 @@
           </div>
         </router-link>
       </div>
+      <div class="items w-full">
+        <router-link
+          class="cursor-pointer relative"
+          to="/solicitacoes/inicio"
+          :class="{ selected: isSelected('/solicitacoes') }"
+        >
+          <div class="icon-wrapper">
+            <div class="flex justify-center items-center">
+              <ClipboardIcon class="w-5" />
+            </div>
+            <div
+              class="selected-bar"
+              v-if="isSelected('/solicitacoes')"
+              :class="{ 'show-bar': isSelected('/solicitacoes') }"
+            ></div>
+          </div>
+        </router-link>
+      </div>
+      <div class="items w-full">
+        <router-link
+          class="cursor-pointer relative"
+          to="/native"
+          :class="{ selected: isSelected('/native') }"
+        >
+          <div class="icon-wrapper">
+            <div class="flex justify-center items-center">
+              <NativeIcon class="w-8" />
+            </div>
+            <div
+              class="selected-bar"
+              v-if="isSelected('/native')"
+              :class="{ 'show-bar': isSelected('/native') }"
+            ></div>
+          </div>
+        </router-link>
+      </div>
     </nav>
     <div>
       <div class="cursor-pointer text-black" @click="logout">
@@ -61,6 +97,8 @@ import HomeIcon from "@/assets/icons/homeLogo.vue";
 import SearchIcon from "@/assets/icons/searchClient.vue";
 import LogoutIcon from "@/assets/icons/logoutIcon.vue";
 import { useAuthStore } from "@/stores/authStore";
+import ClipboardIcon from "@/assets/icons/ClipboardIcon.vue"
+import NativeIcon from "@/assets/icons/native/nativeIcon.vue"
 
 const route = useRoute();
 const authStore = useAuthStore();

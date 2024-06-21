@@ -5,11 +5,12 @@ import HomeComponent from "@/components/Home/HomeComponent.vue";
 import ClientLayout from "@/views/attendant/ClientDetailsView.vue";
 import ClientDetails from "@/views/attendant/ClientDetailsPage.vue";
 import ClientActions from "@/views/attendant/ClientActionsPage.vue";
-import ReportRouter from "@/components/Report/ReportRouter.vue";
 import OltListComponent from "@/components/OLTs/OltListComponent.vue";
 import SearchPage from "@/views/searchClient/searchClientView.vue";
 
 import { useClientDetailsStore } from "@/stores/clientDetailsStore";
+import SolicitationsComponent from "@/components/solicitations/SolicitationsComponent.vue";
+import NativeHome from "@/components/native/NativeHome.vue";
 
 const routes = [
   {
@@ -34,7 +35,6 @@ const routes = [
         path: "/inicio",
         component: HomeComponent,
         meta: {
-          inicioSelected: true,
           requiresAuth: true,
         },
       },
@@ -93,8 +93,15 @@ const routes = [
         },
       },
       {
-        path: "relatorio/inicio",
-        component: ReportRouter,
+        path: "solicitacoes/inicio",
+        component: SolicitationsComponent,
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "native/",
+        component: NativeHome,
         meta: {
           requiresAuth: true,
         },

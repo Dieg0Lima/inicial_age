@@ -2,7 +2,7 @@ import router from "../router";
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://192.168.68.220:3000'
+    baseURL: 'http://192.168.69.79:3000'
     ,
 });
 

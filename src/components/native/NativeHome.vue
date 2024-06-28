@@ -1,12 +1,12 @@
 <template>
   <a-config-provider :theme="themeConfig">
     <div class="w-screen h-screen p-4">
-      <div class="h-full bg-white rounded-lg p-2 ">
+      <div class="h-full bg-white rounded-lg p-2">
         <div
           class="h-[8%] bg-age-colorOrange rounded-lg flex items-center px-4 justify-between"
         >
           <div class="flex flex-row items-center gap-4">
-            <img :src="NativeIcon" alt="Native Icon" />
+            <img :src="NativeIcon" />
             <h1 class="text-xl font-bold text-white">Áudios do Native</h1>
           </div>
           <div class="flex items-center h-full p-3">
@@ -31,23 +31,23 @@
                   @click="handleMenuClick"
                   class="flex flex-col items-center justify-center gap-2"
                 >
-                  <a-range-picker class="w-full" size="large" />
-                  <a-select
-                    v-model:value="attendant"
-                    mode="tags"
-                    size="large"
-                    placeholder="Atendente"
-                    class="w-full"
-                    @change="handleChange"
-                  ></a-select>
-                  <a-select
-                    v-model:value="client"
-                    mode="tags"
+                  <a-date-picker
+                    v-model:value="selectedDate"
                     class="w-full"
                     size="large"
-                    placeholder="Número do cliente"
-                    @change="handleChange"
-                  ></a-select>
+                  />
+                  <a-input
+                    v-model:value="selectedSrc"
+                    size="large"
+                    placeholder="Origem"
+                    class="w-full"
+                  ></a-input>
+                  <a-input
+                    v-model:value="selectedDst"
+                    class="w-full"
+                    size="large"
+                    placeholder="Destino"
+                  ></a-input>
                   <a-button
                     size="large"
                     class="group bg-age-colorOrange text-white hover:bg-age-colorLightOrangeHover hover:text-white"
@@ -81,53 +81,73 @@
             </div>
           </a-col>
           <a-divider type="vertical" class="h-full" />
-          <a-col :flex="3">
-            <a-list item-layout="horizontal" :data-source="data">
-              <template #renderItem="{ item }">
-                <a-list-item>
-                  <a-list-item-meta>
-                    <template #avatar>
-                      <div
-                        class="avatar-container"
-                        @click="togglePlaying(item)"
-                      >
-                        <a-avatar
-                          :src="getAvatar(item.isPlaying)"
-                          :size="64"
-                          :shape="item.isPlaying ? 'square' : 'circle'"
-                        />
+          <a-col class="overflow-y-auto list-container" :flex="3">
+            <a-spin :spinning="loading">
+              <a-list
+                item-layout="horizontal"
+                class="overflow-y-scroll"
+                :data-source="audios"
+              >
+                <template #renderItem="{ item }">
+                  <a-list-item>
+                    <a-list-item-meta class="select-text">
+                      <template #avatar>
                         <div
-                          class="avatar-overlay"
-                          @mouseover="item.hovered = true"
-                          @mouseleave="item.hovered = false"
-                          :class="{
-                            hovered: item.hovered,
-                            square: item.isPlaying,
-                            circle: !item.isPlaying,
-                          }"
+                          class="avatar-container"
+                          @click="togglePlaying(item)"
                         >
-                          <img
-                            :src="getHoverIcon(item.isPlaying)"
-                            class="overlay-icon"
+                          <a-avatar
+                            :src="getAvatar(item.isPlaying)"
+                            :size="64"
+                            :shape="item.isPlaying ? 'square' : 'circle'"
                           />
+                          <div
+                            class="avatar-overlay"
+                            @mouseover="item.hovered = true"
+                            @mouseleave="item.hovered = false"
+                            :class="{
+                              hovered: item.hovered,
+                              square: item.isPlaying,
+                              circle: !item.isPlaying,
+                            }"
+                          >
+                            <img
+                              :src="getHoverIcon(item.isPlaying)"
+                              class="overlay-icon"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </template>
-                    <template #title>
-                      <a href="#">{{ item.name }}</a>
-                    </template>
-                    <template #description>
-                      <div class="flex flex-row justify-between">
-                        <div>{{ item.attendant }}</div>
-                        <div>{{ item.phoneNumber }}</div>
-                        <div>{{ item.date }}</div>
-                        <div>{{ item.duration }}</div>
-                      </div>
-                    </template>
-                  </a-list-item-meta>
-                </a-list-item>
-              </template>
-            </a-list>
+                      </template>
+                      <template #title>
+                        <div>{{ item.uniqueid }}</div>
+                      </template>
+                      <template #description>
+                        <div class="flex flex-row justify-between">
+                          <a-tooltip>
+                            <template #title
+                              >Data de inicio da chamada</template
+                            >
+                            <div>{{ formatDate(item.start) }}</div>
+                          </a-tooltip>
+                          <a-tooltip>
+                            <template #title>Origem da chamada</template>
+                            <div>{{ item.src }}</div>
+                          </a-tooltip>
+                          <a-tooltip>
+                            <template #title>Destino da chamada</template>
+                            <div>{{ item.dst }}</div>
+                          </a-tooltip>
+                          <a-tooltip>
+                            <template #title>Direção da chamada</template>
+                            <div>{{ item.direction }}</div>
+                          </a-tooltip>
+                        </div>
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
+                </template>
+              </a-list>
+            </a-spin>
           </a-col>
         </a-row>
         <div class="flex flex-col audio-bar" v-if="currentPlaying">
@@ -210,57 +230,52 @@
 </template>
 
 <script setup>
-import NativeIcon from "@/assets/icons/native/NativeIcon.png";
-import SearchIcon from "@/assets/icons/searchClient/searchIcon.vue";
-import FilterIcon from "@/assets/icons/native/filterIcon.vue";
-import { ref, watch, nextTick } from "vue";
-
+import { ref, watch, nextTick, computed } from "vue";
+import { useNativeAudioStore } from "@/stores/nativeAudioStore.js";
 import { Howl } from "howler";
-
 import audioPlaying from "@/assets/icons/native/audioPlaying.png";
 import audioNotPlaying from "@/assets/icons/native/audioNotPlaying.png";
-
 import playIcon from "@/assets/icons/native/Play.png";
 import stopIcon from "@/assets/icons/native/Pause.png";
+import FilterIcon from "@/assets/icons/native/filterIcon.vue";
+import NativeIcon from "@/assets/icons/native/NativeIcon.png";
+import SearchIcon from "@/assets/icons/searchClient/searchIcon.vue";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
-const searchValue = ref("");
+dayjs.extend(utc);
+
+const selectedDate = ref(null);
+const selectedSrc = ref([]);
+const selectedDst = ref([]);
+const loading = ref(false);
+const nativeAudioStore = useNativeAudioStore();
+const audios = computed(() => nativeAudioStore.provisionResponse);
 
 const handleMenuClick = (e) => {
   console.log("click", e);
 };
 
-function onSearch() {
-  console.log("Valor pesquisado:", searchValue.value);
-}
-
-function onFilter() {
-  console.log("Filtro aplicado");
-}
-
-const themeConfig = {
-  token: {
-    colorPrimary: "#FF8B3D",
-  },
+const formatDate = (dateString) => {
+  return dayjs.utc(dateString).format("DD/MM/YYYY HH:mm:ss");
 };
 
-const data = ref([
-  {
-    id: 1,
-    isPlaying: false,
-    hovered: false,
-    name: "Nome do Áudio 1",
-    attendant: "Atendente 1",
-    phoneNumber: "(11) 1234-5678",
-    date: "2024-06-19",
-    duration: "3:45",
-    audioSrc: "/audio/FinalDaTarde.mp3",
-    coverImage: "/audio/FinalDaTarde.png",
-    howl: null,
-    audioContext: null,
-    analyser: null,
-    dataArray: null,
-  },
-]);
+async function applyFilters() {
+  loading.value = true;
+
+  const src = selectedSrc.value;
+  const dst = selectedDst.value;
+
+  await nativeAudioStore.nativeAudio({ src, dst });
+
+  loading.value = false;
+
+  if (nativeAudioStore.error) {
+    console.error("Erro ao fazer a requisição:", nativeAudioStore.error);
+  } else {
+    console.log("Resposta da API:", nativeAudioStore.provisionResponse);
+  }
+}
 
 const currentPlaying = ref(null);
 const progress = ref(0);
@@ -271,7 +286,7 @@ const speedOptions = [0.5, 1, 1.25, 1.5, 1.75, 2];
 const customColor = ref("#FF8B3D");
 
 function togglePlaying(item) {
-  data.value.forEach((audio) => {
+  audios.value.forEach((audio) => {
     if (audio !== item) {
       if (audio.howl) {
         audio.howl.stop();
@@ -282,7 +297,7 @@ function togglePlaying(item) {
 
   if (!item.howl) {
     item.howl = new Howl({
-      src: [item.audioSrc],
+      src: [item.url],
       html5: true,
       onend: function () {
         item.isPlaying = false;
@@ -358,8 +373,8 @@ function downloadAudio() {
   if (!currentPlaying.value) return;
 
   const link = document.createElement("a");
-  link.href = currentPlaying.value.audioSrc;
-  link.download = currentPlaying.value.name + ".mp3";
+  link.href = currentPlaying.value.url;
+  link.download = currentPlaying.value.uniqueid + ".mp3";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -384,6 +399,11 @@ watch(currentPlaying, () => {
 </script>
 
 <style scoped>
+.list-container {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
 .icon-button {
   background: none;
   border: none;
